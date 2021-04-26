@@ -84,6 +84,7 @@ for(let item of outList){
 listHtml += '</div>';
 const html = header + '<style>' + highlightStyle +'</style>' + listHtml + footer + '<style>' + theme +'</style>';
 fs.writeFileSync(__dirname+'/out/listing.html', html);
+fs.writeFileSync(__dirname+'/out/listing.json', JSON.stringify(outList, null, 2));
 
 
 

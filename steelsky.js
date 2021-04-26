@@ -8,6 +8,8 @@ const footer = fs.readFileSync(__dirname+'/layout/footer.html','utf-8');
 const theme = fs.readFileSync(__dirname+'/layout/theme.css','utf-8');
 const highlightStyle = fs.readFileSync(__dirname+'/node_modules/highlight.js/styles/a11y-dark.css','utf-8');
 
+let outList = [];
+
 // After requiring the module, use it as extension
 let converter = new showdown.Converter({
     // That's it
@@ -38,6 +40,11 @@ function convert(fileLoc){
   }else{
     fs.copyFileSync(__dirname + '/source/' + fileLoc, __dirname+'/out/'+fileLoc);
   }
+  if(noExt[0]==='/'){
+    noExt[0]='';
+  }
+  const listingLoc = noExt.replace(/^\/+/g, '')+ext;//Remove leading slash
+  outList.push(listingLoc);
 }
 
 function traverse(path, rootPath, list = []){
@@ -67,5 +74,16 @@ if (!fs.existsSync(__dirname+'/out')){
 for(let item of list){
   convert(item);
 }
+
+// Generate Directory Listing
+let listHtml = '<div class="ss-listing-area">';
+console.log(outList);
+for(let item of outList){
+  listHtml += '<a class="ss-listing" href="'+item+'">'+item+'</a><br>';
+}
+listHtml += '</div>';
+const html = header + '<style>' + highlightStyle +'</style>' + listHtml + footer + '<style>' + theme +'</style>';
+fs.writeFileSync(__dirname+'/out/listing.html', html);
+
 
 

@@ -40,6 +40,7 @@ function traverse(path, rootPath, list = []){
 function convert(fileLoc){
   const parsed = path.parse(fileLoc);
   let ext = parsed.ext;
+  const originalExt = ext;
   let html;
   if(ext === '.md'){
     const file = fs.readFileSync(__dirname+'/source/'+fileLoc,'utf-8');
@@ -54,7 +55,7 @@ function convert(fileLoc){
     console.log('New Dir: '+realPath);
     fs.mkdirSync(realPath);
   }
-  if(ext === '.html'){
+  if(originalExt === '.md'){
     fs.writeFileSync(writeLoc, html);
   }else{
     fs.copyFileSync(__dirname + '/source/' + fileLoc, __dirname+'/out/'+fileLoc);

@@ -19,3 +19,7 @@ Automatically converts an arbitrary directory structure containing markdown and 
 
 * Showdown
 * Showdown-highlight
+
+## Example
+
+See the [SteelSky Example Project Repo](https://github.com/matdombrock/SteelSkyExample) for an example of how to get started.

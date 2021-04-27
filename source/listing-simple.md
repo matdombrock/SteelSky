@@ -23,6 +23,7 @@ function processListing(){
   for(let item of listing){
     const location = item.location;
     html += `<a href="${location}">${location}</a></br>`;
+    hasResults = true;
   }
   if(!hasResults){
     html += "<strong>No results.</string>";

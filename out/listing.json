@@ -52,22 +52,22 @@
   {
     "path": {
       "root": "",
-      "dir": "listing-examples",
-      "base": "advanced-listing.md",
+      "dir": "",
+      "base": "listing-advanced.md",
       "ext": ".html",
-      "name": "advanced-listing"
+      "name": "listing-advanced"
     },
-    "location": "listing-examples/advanced-listing.html"
+    "location": "listing-advanced.html"
   },
   {
     "path": {
       "root": "",
-      "dir": "listing-examples",
-      "base": "simple-listing.md",
+      "dir": "",
+      "base": "listing-simple.md",
       "ext": ".html",
-      "name": "simple-listing"
+      "name": "listing-simple"
     },
-    "location": "listing-examples/simple-listing.html"
+    "location": "listing-simple.html"
   },
   {
     "path": {

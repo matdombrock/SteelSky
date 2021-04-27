@@ -3,7 +3,7 @@
 <small>A very lightweight, no BS static site generator written in NodeJS.</small>
 <hr>
 <h3>
-  <a href="/testx/out/listing.html">listing</a> |
+  <a href="/testx/out/listing-advanced.html">listing</a> |
   <a href="/testx/out/test.html">test</a> |
   <a href="/testx/out/x/y.html">x/y</a>
 </h3>
@@ -106,11 +106,37 @@
         font-weight: bold;
     }
 }
-</style><h1 id="baconpancakes">Bacon pancakes</h1>
-<h2 id="smallerheader">Smaller header</h2>
-<p>This is a post about bacon pancakes. </p>
-<p><img src="bpc.jpg" alt="bpc" /></p>
-<p><a href="https://www.youtube.com/watch?v=FjxAAezqJZQ">video</a></p><hr>
+</style><h1 id="simplelistingexample">Simple Listing Example</h1>
+<div id="listing-area"></div>
+<script>
+
+let listing;
+
+const xhttp = new XMLHttpRequest();
+xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      listing = JSON.parse(xhttp.responseText);
+      processListing();
+    }
+};
+xhttp.open("GET", "/testx/out/listing.json", true);
+xhttp.send();
+
+function processListing(){
+  let html = "";
+  let hasResults = false;
+  for(let item of listing){
+    const location = item.location;
+    html += `<a href="${location}">${location}</a></br>`;
+    hasResults = true;
+  }
+  if(!hasResults){
+    html += "<strong>No results.</string>";
+  }
+  document.getElementById('listing-area').innerHTML = html;
+}
+
+</script><hr>
 <div>Footer | <a href="https://github.com/matdombrock/SteelSky" target="_blank">Github</a></div><style>body{
   background:rgb(33, 33, 33);
   color:rgb(233, 233, 233);
@@ -118,4 +144,7 @@
 }
 a{
   color:rgb(233, 233, 233);
+}
+img{
+  max-width:100%;
 }</style>

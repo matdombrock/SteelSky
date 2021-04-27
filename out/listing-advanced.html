@@ -3,7 +3,7 @@
 <small>A very lightweight, no BS static site generator written in NodeJS.</small>
 <hr>
 <h3>
-  <a href="/testx/out/listing.html">listing</a> |
+  <a href="/testx/out/listing-advanced.html">listing</a> |
   <a href="/testx/out/test.html">test</a> |
   <a href="/testx/out/x/y.html">x/y</a>
 </h3>
@@ -106,7 +106,69 @@
         font-weight: bold;
     }
 }
-</style><div class="ss-listing-area"><a class="ss-listing" href="custom-listing.html">custom-listing.html</a><br><a class="ss-listing" href="img_test/img.gif">img_test/img.gif</a><br><a class="ss-listing" href="img_test/img_test.html">img_test/img_test.html</a><br><a class="ss-listing" href="md-html.html">md-html.html</a><br><a class="ss-listing" href="t.txt">t.txt</a><br><a class="ss-listing" href="test.html">test.html</a><br><a class="ss-listing" href="x/y.html">x/y.html</a><br></div><hr>
+</style><h1 id="advancedlistingexample">Advanced Listing Example</h1>
+<p><select id="filter" onchange="processListing()">
+  <option value="all">All</option>
+  <option value=".html">HTML</option>
+  <option value=".gif">GIF</option>
+  <option value=".png">PNG</option>
+  <option value=".jpg">JPG</option>
+  <option value=".txt">TXT</option>
+</select>
+<input type="text" id="search" onchange="processListing()" placeholder="search term"></p>
+<div id="listing-area"></div>
+<script>
+
+let listing;
+
+const xhttp = new XMLHttpRequest();
+xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      listing = JSON.parse(xhttp.responseText);
+      processListing();
+    }
+};
+xhttp.open("GET", "/testx/out/listing.json", true);
+xhttp.send();
+
+function processListing(){
+  if (!listing){
+    alert("waiting for listing to load!");
+    return;
+  }
+  const filterType = document.getElementById('filter').value;
+  const searchString = document.getElementById('search').value;
+  let html = "";
+  let hasResults = false;
+  for(let item of listing){
+
+    const location = item.location;
+    const ext = item.path.ext;
+    console.log(`${filterType} -> ${ext}`);
+    let passed = true;
+    // File filters
+    if(ext !== filterType){
+      passed = false;
+    }
+    if(filterType == 'all'){
+      passed = true;
+    }
+    // Text filter
+    if(!location.includes(searchString)){
+      passed = false;
+    }
+    if(passed){
+      html += `<a href="${location}">${location}</a></br>`;
+      hasResults = true;
+    }
+  }
+  if(!hasResults){
+    html += "<strong>No results for this filter.</string>";
+  }
+  document.getElementById('listing-area').innerHTML = html;
+}
+
+</script><hr>
 <div>Footer | <a href="https://github.com/matdombrock/SteelSky" target="_blank">Github</a></div><style>body{
   background:rgb(33, 33, 33);
   color:rgb(233, 233, 233);
@@ -114,4 +176,7 @@
 }
 a{
   color:rgb(233, 233, 233);
+}
+img{
+  max-width:100%;
 }</style>

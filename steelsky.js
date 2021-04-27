@@ -1,12 +1,14 @@
 const showdown = require('showdown');
 const showdownHighlight = require("showdown-highlight");
-
 const fs = require('fs');
 const path = require('path');
-const header = fs.readFileSync(__dirname+'/layout/header.html','utf-8');
-const footer = fs.readFileSync(__dirname+'/layout/footer.html','utf-8');
-const theme = fs.readFileSync(__dirname+'/layout/theme.css','utf-8');
-const highlightStyle = fs.readFileSync(__dirname+'/node_modules/highlight.js/styles/a11y-dark.css','utf-8');
+
+const {sourcePath, layoutPath, highlightStyle, outPath}  = require('./config');
+
+const header = fs.readFileSync(layoutPath+'/header.html','utf-8');
+const footer = fs.readFileSync(layoutPath+'/footer.html','utf-8');
+const theme = fs.readFileSync(layoutPath+'/theme.css','utf-8');
+const highlightStyleCSS = fs.readFileSync(__dirname+'/node_modules/highlight.js/styles/'+highlightStyle+'.css','utf-8');
 
 let outList = [];
 
@@ -43,13 +45,13 @@ function convert(fileLoc){
   const originalExt = ext;
   let html;
   if(ext === '.md'){
-    const file = fs.readFileSync(__dirname+'/source/'+fileLoc,'utf-8');
+    const file = fs.readFileSync(sourcePath+'/'+fileLoc,'utf-8');
     ext = '.html';
     parsed.ext = '.html';
-    html = header + '<style>' + highlightStyle +'</style>' + converter.makeHtml(file) + footer + '<style>' + theme +'</style>';
+    html = header + '<style>' + highlightStyleCSS +'</style>' + converter.makeHtml(file) + footer + '<style>' + theme +'</style>';
   }
   const noExt = parsed.dir + '/' + parsed.name;
-  const writeLoc = __dirname+'/out/'+noExt+ext;
+  const writeLoc = outPath+'/'+noExt+ext;
   const realPath = path.parse(writeLoc).dir;
   if (!fs.existsSync(realPath)){
     console.log('New Dir: '+realPath);
@@ -58,7 +60,7 @@ function convert(fileLoc){
   if(originalExt === '.md'){
     fs.writeFileSync(writeLoc, html);
   }else{
-    fs.copyFileSync(__dirname + '/source/' + fileLoc, __dirname+'/out/'+fileLoc);
+    fs.copyFileSync(sourcePath+ '/' + fileLoc, outPath+'/'+fileLoc);
   }
   if(noExt[0]==='/'){
     noExt[0]='';
@@ -71,12 +73,12 @@ function convert(fileLoc){
   outList.push(outListData);
 }
 
-const list = traverse(__dirname+'/source', __dirname+'/source');
+const list = traverse(sourcePath, sourcePath);
 console.log(list);
 
-if (!fs.existsSync(__dirname+'/out')){
+if (!fs.existsSync(outPath)){
   console.log('Create Out Directory');
-  fs.mkdirSync(__dirname+'/out');
+  fs.mkdirSync(outPath);
 }
 
 for(let item of list){
@@ -92,7 +94,7 @@ for(let item of list){
 // listHtml += '</div>';
 // const html = header + '<style>' + highlightStyle +'</style>' + listHtml + footer + '<style>' + theme +'</style>';
 // fs.writeFileSync(__dirname+'/out/listing.html', html);
-fs.writeFileSync(__dirname+'/out/listing.json', JSON.stringify(outList, null, 2));
+fs.writeFileSync(outPath+'/listing.json', JSON.stringify(outList, null, 2));
 
 
 

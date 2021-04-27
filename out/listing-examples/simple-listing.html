@@ -106,9 +106,36 @@
         font-weight: bold;
     }
 }
-</style><h1 id="helloworld">Hello World</h1>
-<pre class="js language-js"><code class="hljs js language-js">alert(<span class="hljs-string">&#x27;hello world&#x27;</span>);
-</code></pre><hr>
+</style><h1 id="simplelistingexample">Simple Listing Example</h1>
+<div id="listing-area"></div>
+<script>
+
+let listing;
+
+const xhttp = new XMLHttpRequest();
+xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      listing = JSON.parse(xhttp.responseText);
+      processListing();
+    }
+};
+xhttp.open("GET", "/testx/out/listing.json", true);
+xhttp.send();
+
+function processListing(){
+  let html = "";
+  let hasResults = false;
+  for(let item of listing){
+    const location = item.location;
+    html += `<a href="${location}">${location}</a></br>`;
+  }
+  if(!hasResults){
+    html += "<strong>No results.</string>";
+  }
+  document.getElementById('listing-area').innerHTML = html;
+}
+
+</script><hr>
 <div>Footer | <a href="https://github.com/matdombrock/SteelSky" target="_blank">Github</a></div><style>body{
   background:rgb(33, 33, 33);
   color:rgb(233, 233, 233);

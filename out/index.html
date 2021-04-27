@@ -106,9 +106,23 @@
         font-weight: bold;
     }
 }
-</style><h1 id="helloworld">Hello World</h1>
-<pre class="js language-js"><code class="hljs js language-js">alert(<span class="hljs-string">&#x27;hello world&#x27;</span>);
-</code></pre><hr>
+</style><h1 id="steelsky">STEEL SKY</h1>
+<div id="quote">...</div>
+<p><img src="bss-ss.jpg" alt="bss-ss" /></p>
+<script>
+  const quotes = [
+    "A discarded coffee machine?",
+    "BARBECUED! I'll never eat KEBAB again!",
+    "That thing's WATCHING me... Good thing I'm naturally PHOTOGENIC!",
+    "EX-TER-MIN-ATE! EX-TER-MIN-ATE",
+    "I hope you have learned something about pipes!",
+    "We also have a rogue robot policy.",
+    "Give me an analysis, Joey.",
+    "You didn't tell me you could fly!",
+    "What's that ROBOT doing here?",
+  ];
+  document.getElementById('quote').innerHTML = '"' + quotes[Math.floor(Math.random() * quotes.length)] + '"';
+</script><hr>
 <div>Footer | <a href="https://github.com/matdombrock/SteelSky" target="_blank">Github</a></div><style>body{
   background:rgb(33, 33, 33);
   color:rgb(233, 233, 233);

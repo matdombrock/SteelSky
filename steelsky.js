@@ -19,13 +19,32 @@ let converter = new showdown.Converter({
     })]
 });
 
+
+
+function traverse(path, rootPath, list = []){
+  const listing = fs.readdirSync(path);
+  for(let item of listing){
+    let itemPath = `${path}/${item}`
+    const isDirectory = fs.lstatSync(itemPath).isDirectory();
+    if(isDirectory){
+      list = traverse(itemPath,rootPath, list);
+    }
+    else{
+      itemPath = itemPath.replace(`${rootPath}/`, '');
+      list.push(itemPath);
+    }
+  }
+  return list;
+}
+
 function convert(fileLoc){
   const parsed = path.parse(fileLoc);
   let ext = parsed.ext;
   let html;
   if(ext === '.md'){
     const file = fs.readFileSync(__dirname+'/source/'+fileLoc,'utf-8');
-    ext = '.html'
+    ext = '.html';
+    parsed.ext = '.html';
     html = header + '<style>' + highlightStyle +'</style>' + converter.makeHtml(file) + footer + '<style>' + theme +'</style>';
   }
   const noExt = parsed.dir + '/' + parsed.name;
@@ -44,23 +63,11 @@ function convert(fileLoc){
     noExt[0]='';
   }
   const listingLoc = noExt.replace(/^\/+/g, '')+ext;//Remove leading slash
-  outList.push(listingLoc);
-}
-
-function traverse(path, rootPath, list = []){
-  const listing = fs.readdirSync(path);
-  for(let item of listing){
-    let itemPath = `${path}/${item}`
-    const isDirectory = fs.lstatSync(itemPath).isDirectory();
-    if(isDirectory){
-      list = traverse(itemPath,rootPath, list);
-    }
-    else{
-      itemPath = itemPath.replace(`${rootPath}/`, '');
-      list.push(itemPath);
-    }
-  }
-  return list;
+  const outListData = {
+    path: parsed,
+    location: listingLoc
+  };
+  outList.push(outListData);
 }
 
 const list = traverse(__dirname+'/source', __dirname+'/source');
@@ -76,14 +83,14 @@ for(let item of list){
 }
 
 // Generate Directory Listing
-let listHtml = '<div class="ss-listing-area">';
-console.log(outList);
-for(let item of outList){
-  listHtml += '<a class="ss-listing" href="'+item+'">'+item+'</a><br>';
-}
-listHtml += '</div>';
-const html = header + '<style>' + highlightStyle +'</style>' + listHtml + footer + '<style>' + theme +'</style>';
-fs.writeFileSync(__dirname+'/out/listing.html', html);
+// let listHtml = '<div class="ss-listing-area">';
+// console.log(outList);
+// for(let item of outList){
+//   listHtml += '<a class="ss-listing" href="'+item+'">'+item+'</a><br>';
+// }
+// listHtml += '</div>';
+// const html = header + '<style>' + highlightStyle +'</style>' + listHtml + footer + '<style>' + theme +'</style>';
+// fs.writeFileSync(__dirname+'/out/listing.html', html);
 fs.writeFileSync(__dirname+'/out/listing.json', JSON.stringify(outList, null, 2));
 
 

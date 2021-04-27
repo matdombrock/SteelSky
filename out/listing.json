@@ -1,7 +1,122 @@
 [
-  "img_test/img.gif",
-  "img_test/img_test.html",
-  "t.txt",
-  "test.html",
-  "x/y.html"
+  {
+    "path": {
+      "root": "",
+      "dir": "",
+      "base": "bss-ss.jpg",
+      "ext": ".jpg",
+      "name": "bss-ss"
+    },
+    "location": "bss-ss.jpg"
+  },
+  {
+    "path": {
+      "root": "",
+      "dir": "",
+      "base": "favicon.ico",
+      "ext": ".ico",
+      "name": "favicon"
+    },
+    "location": "favicon.ico"
+  },
+  {
+    "path": {
+      "root": "",
+      "dir": "img_test",
+      "base": "img.gif",
+      "ext": ".gif",
+      "name": "img"
+    },
+    "location": "img_test/img.gif"
+  },
+  {
+    "path": {
+      "root": "",
+      "dir": "img_test",
+      "base": "img_test.md",
+      "ext": ".html",
+      "name": "img_test"
+    },
+    "location": "img_test/img_test.html"
+  },
+  {
+    "path": {
+      "root": "",
+      "dir": "",
+      "base": "index.md",
+      "ext": ".html",
+      "name": "index"
+    },
+    "location": "index.html"
+  },
+  {
+    "path": {
+      "root": "",
+      "dir": "listing-examples",
+      "base": "advanced-listing.md",
+      "ext": ".html",
+      "name": "advanced-listing"
+    },
+    "location": "listing-examples/advanced-listing.html"
+  },
+  {
+    "path": {
+      "root": "",
+      "dir": "listing-examples",
+      "base": "simple-listing.md",
+      "ext": ".html",
+      "name": "simple-listing"
+    },
+    "location": "listing-examples/simple-listing.html"
+  },
+  {
+    "path": {
+      "root": "",
+      "dir": "",
+      "base": "md-html.md",
+      "ext": ".html",
+      "name": "md-html"
+    },
+    "location": "md-html.html"
+  },
+  {
+    "path": {
+      "root": "",
+      "dir": "",
+      "base": "raw-html.html",
+      "ext": ".html",
+      "name": "raw-html"
+    },
+    "location": "raw-html.html"
+  },
+  {
+    "path": {
+      "root": "",
+      "dir": "",
+      "base": "t.txt",
+      "ext": ".txt",
+      "name": "t"
+    },
+    "location": "t.txt"
+  },
+  {
+    "path": {
+      "root": "",
+      "dir": "",
+      "base": "test.md",
+      "ext": ".html",
+      "name": "test"
+    },
+    "location": "test.html"
+  },
+  {
+    "path": {
+      "root": "",
+      "dir": "x",
+      "base": "y.md",
+      "ext": ".html",
+      "name": "y"
+    },
+    "location": "x/y.html"
+  }
 ]

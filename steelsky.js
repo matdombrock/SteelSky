@@ -1,9 +1,22 @@
+#!/usr/bin/env node
 const showdown = require('showdown');
 const showdownHighlight = require("showdown-highlight");
 const fs = require('fs');
 const path = require('path');
 
-const {sourcePath, layoutPath, highlightStyle, outPath}  = require('./config');
+if (!fs.existsSync(process.cwd()+'/config.js')){
+  const configExample = {
+    sourcePath: '<path>/source',
+    layoutPath: '<path>/layout',
+    highlightStyle: 'a11y-dark',
+    outPath: '<path>/out',
+  }
+  console.log("Please create a 'config.js' file in this directory:");
+  console.log('module.exports = ' + JSON.stringify(configExample, null, 2) + ';');
+  return;
+}
+
+const {sourcePath, layoutPath, highlightStyle, outPath}  = require(process.cwd()+'/config');
 
 const header = fs.readFileSync(layoutPath+'/header.html','utf-8');
 const footer = fs.readFileSync(layoutPath+'/footer.html','utf-8');

@@ -1,13 +1,17 @@
 {
   "name": "steelsky",
-  "version": "1.0.0",
-  "description": "",
+  "version": "1.0.1",
+  "description": "A *very* lightweight, no BS static site generator written in NodeJS.",
   "main": "steelsky.js",
   "bin":{
     "steelsky":"./steelsky.js"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/matdombrock/SteelSky.git"
   },
   "keywords": [],
   "author": "",

@@ -57,10 +57,18 @@ function convert(fileLoc){
   let ext = parsed.ext;
   const originalExt = ext;
   let html;
+  let metaJSON = {};
   if(ext === '.md'){
-    const file = fs.readFileSync(sourcePath+'/'+fileLoc,'utf-8');
+    let file = fs.readFileSync(sourcePath+'/'+fileLoc,'utf-8');
     ext = '.html';
     parsed.ext = '.html';
+    if(file.substring(0,10)==='<steelsky>'){
+      let meta = file.split('</steelsky>')[0];
+      let metaLength = meta.length + 10;
+      file = file.substring(metaLength, file.length);
+      meta = meta.replace('<steelsky>','');
+      metaJSON = JSON.parse(meta);
+    }
     html = header + '<style>' + highlightStyleCSS +'</style>' + converter.makeHtml(file) + footer + '<style>' + theme +'</style>';
   }
   const noExt = parsed.dir + '/' + parsed.name;
@@ -81,7 +89,8 @@ function convert(fileLoc){
   const listingLoc = noExt.replace(/^\/+/g, '')+ext;//Remove leading slash
   const outListData = {
     path: parsed,
-    location: listingLoc
+    location: listingLoc,
+    meta: metaJSON
   };
   outList.push(outListData);
 }

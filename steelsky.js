@@ -48,19 +48,22 @@ function traverse(path, rootPath, list = []){
 function convert(fileLoc){
   const parsed = path.parse(fileLoc);
   let ext = parsed.ext;
-  const originalExt = ext;
+  parsed.originalExt = ext;
   let html;
   let metaJSON = {};
   if(ext === '.md'){
     let file = fs.readFileSync(sourcePath+'/'+fileLoc,'utf-8');
     ext = '.html';
     parsed.ext = '.html';
+    // Parse meta data
     if(file.substring(0,10)==='<steelsky>'){
       let meta = file.split('</steelsky>')[0];
-      let metaLength = meta.length + 10;
-      file = file.substring(metaLength, file.length);
       meta = meta.replace('<steelsky>','');
       metaJSON = JSON.parse(meta);
+      //let metaLength = meta.length + 10;
+      //file = file.substring(metaLength, file.length);
+      file = file.replace('<steelsky>','<script>const ssmeta=');
+      file = file.replace('</steelsky>',';</script>');
     }
     html = header + '<style>' + highlightStyleCSS +'</style>' + converter.makeHtml(file) + footer + '<style>' + theme +'</style>';
   }
@@ -71,7 +74,7 @@ function convert(fileLoc){
     console.log('New Dir: '+realPath);
     fs.mkdirSync(realPath);
   }
-  if(originalExt === '.md'){
+  if(parsed.originalExt === '.md'){
     fs.writeFileSync(writeLoc, html);
   }else{
     fs.copyFileSync(sourcePath+ '/' + fileLoc, outPath+'/'+fileLoc);
@@ -80,11 +83,13 @@ function convert(fileLoc){
     noExt[0]='';
   }
   const listingLoc = noExt.replace(/^\/+/g, '')+ext;//Remove leading slash
-  const outListData = {
+  let outListData = {
     path: parsed,
-    location: listingLoc,
-    meta: metaJSON
+    location: listingLoc
   };
+  if(parsed.originalExt === '.md'){
+    outListData.meta = metaJSON;
+  }
   outList.push(outListData);
 }
 

@@ -108,5 +108,5 @@ for(let item of list){
 
 fs.writeFileSync(outPath+'/listing.json', JSON.stringify(outList, null, 2));
 
-
+fs.copyFileSync(__dirname+'/resources/ssList.js', outPath+'/ssList.js');
 

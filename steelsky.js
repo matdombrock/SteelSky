@@ -13,6 +13,10 @@ if (!fs.existsSync(process.cwd()+'/config.js')){
   }
   console.log("Please create a 'config.js' file in this directory:");
   console.log('module.exports = ' + JSON.stringify(configExample, null, 2) + ';');
+  console.log("An example config file will now be created in the current directory...");
+  fs.copyFileSync(__dirname+'/resources/config.example.js', process.cwd()+'/config.example.js');
+  console.log("Please edit this file and rename it to 'config.js' to continue.");
+  console.log("Good bye!");
   return;
 }
 

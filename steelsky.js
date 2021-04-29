@@ -72,7 +72,7 @@ function convert(fileLoc){
   const realPath = path.parse(writeLoc).dir;
   if (!fs.existsSync(realPath)){
     console.log('New Dir: '+realPath);
-    fs.mkdirSync(realPath);
+    fs.mkdirSync(realPath, {recursive: true});
   }
   if(parsed.originalExt === '.md'){
     fs.writeFileSync(writeLoc, html);
@@ -98,7 +98,7 @@ console.log(list);
 
 if (!fs.existsSync(outPath)){
   console.log('Create Out Directory');
-  fs.mkdirSync(outPath);
+  fs.mkdirSync(outPath, {recursive: true});
 }
 
 let outList = [];

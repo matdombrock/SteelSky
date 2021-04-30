@@ -30,7 +30,8 @@ const highlightStyleCSS = fs.readFileSync(__dirname+'/node_modules/highlight.js/
 let converter = new showdown.Converter({
     extensions: [showdownHighlight({
         pre: true
-    })]
+    })],
+    tables: true
 });
 
 function traverse(path, rootPath, list = []){

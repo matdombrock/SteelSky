@@ -70,7 +70,7 @@ function convert(fileLoc){
       file = file.replace('<steelsky>','<script>const ssmeta=');
       file = file.replace('</steelsky>',';</script>');
     }
-    html = header + '<style>' + highlightStyleCSS +'</style>' + converter.makeHtml(file) + footer + '<style>' + theme +'</style>';
+    html = header + '<style>' + highlightStyleCSS +'</style>' + '<style>' + theme +'</style>' + converter.makeHtml(file) + footer;
   }
   const noExt = parsed.dir + '/' + parsed.name;
   const writeLoc = outPath+'/'+noExt+ext;

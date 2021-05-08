@@ -80,7 +80,7 @@ function convert(fileLoc){
     fs.mkdirSync(realPath, {recursive: true});
   }
   if(parsed.originalExt === '.md'){
-    fs.writeFileSync(writeLoc, html);
+    fs.writeFileSync(writeLoc, html, {encoding: 'utf-8'});
   }else{
     fs.copyFileSync(sourcePath+ '/' + fileLoc, outPath+'/'+fileLoc);
   }

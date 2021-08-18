@@ -65,8 +65,6 @@ function convert(fileLoc){
       let meta = file.split('</steelsky>')[0];
       meta = meta.replace('<steelsky>','');
       metaJSON = JSON.parse(meta);
-      //let metaLength = meta.length + 10;
-      //file = file.substring(metaLength, file.length);
       file = file.replace('<steelsky>','<script>const ssmeta=');
       file = file.replace('</steelsky>',';</script>');
     }

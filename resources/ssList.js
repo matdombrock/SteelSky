@@ -52,6 +52,12 @@ ssList.renderListingPretty = (listing)=>{
   for(let item of listing){
     const location = item.location;
     const ext = item.path.ext;
+    if(!item.path.name){
+      continue;
+    }
+    if(!item.meta){
+      continue;
+    }
     html += '<div class="ss-listing-item-wrap">';
     const name = Object.keys(item.meta).length > 0 ? item.meta.title : item.path.name;
     html += '<div class="ss-listing-item-title"><a href="'+location+'">'+name+'</a></div>';

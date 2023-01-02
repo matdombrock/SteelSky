@@ -86,7 +86,7 @@ function convert(fileLoc){
   let html;
   let metaJSON = {};
   const isCached = checkCache(fileLoc, sourcePath);
-  if(isCached){
+  if(!isCached){
     if(ext === '.md'){
       let file = fs.readFileSync(sourcePath+'/'+fileLoc,'utf-8');
       ext = '.html';

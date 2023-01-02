@@ -70,11 +70,14 @@ function checkCache(itemPath, rootPath){
   else{
     isCached = false;
   }
-  if(isCached){
+  if(!isCached){
     cache[itemPathSub] = {};
     cache[itemPathSub].mtime = Number(fs.lstatSync(itemPathFull).mtime);
   }
-  //console.log(isNew);
+  else{
+    console.log(Number(fs.lstatSync(itemPathFull).mtime));
+  }
+  
   return isCached;
 }
 

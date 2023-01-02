@@ -34,6 +34,14 @@ let converter = new showdown.Converter({
     tables: true
 });
 
+let cache;
+if(fs.existsSync(__dirname+'/cache.json')){
+  cache = require('./cache.json');
+}
+else{
+  cache = {};
+}
+
 function traverse(path, rootPath, list = []){
   const listing = fs.readdirSync(path);
   for(let item of listing){
@@ -43,10 +51,24 @@ function traverse(path, rootPath, list = []){
       list = traverse(itemPath,rootPath, list);
     }
     else{
-      itemPath = itemPath.replace(`${rootPath}/`, '');
-      list.push(itemPath);
+      let isNew = false;
+      if(cache[itemPath]){
+        if(Number(cache[itemPath].mtime) !== Number(fs.lstatSync(itemPath).mtime)){
+          isNew = true;
+        }
+      }
+      else{
+        isNew = true;
+      }
+      if(isNew){
+        cache[itemPath] = {};
+        cache[itemPath].mtime = Number(fs.lstatSync(itemPath).mtime);
+        itemPath = itemPath.replace(`${rootPath}/`, '');
+        list.push(itemPath);
+      }
     }
   }
+  fs.writeFileSync(__dirname+'/cache.json', JSON.stringify(cache,null,2));
   return list;
 }
 

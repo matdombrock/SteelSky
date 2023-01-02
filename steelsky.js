@@ -35,8 +35,8 @@ let converter = new showdown.Converter({
 });
 
 let cache;
-if(fs.existsSync(__dirname+'/cache.json')){
-  cache = require('./cache.json');
+if(fs.existsSync(process.cwd()+'/cache.json')){
+  cache = require(process.cwd()+'/cache.json');
 }
 else{
   cache = {};
@@ -51,61 +51,71 @@ function traverse(path, rootPath, list = []){
       list = traverse(itemPath,rootPath, list);
     }
     else{
-      let isNew = false;
-      if(cache[itemPath]){
-        if(Number(cache[itemPath].mtime) !== Number(fs.lstatSync(itemPath).mtime)){
-          isNew = true;
-        }
-      }
-      else{
-        isNew = true;
-      }
-      if(isNew){
-        cache[itemPath] = {};
-        cache[itemPath].mtime = Number(fs.lstatSync(itemPath).mtime);
-        itemPath = itemPath.replace(`${rootPath}/`, '');
-        list.push(itemPath);
-      }
+      const itemPathSub = itemPath.replace(`${rootPath}/`, '');
+      list.push(itemPathSub);
     }
   }
-  fs.writeFileSync(__dirname+'/cache.json', JSON.stringify(cache,null,2));
   return list;
+}
+
+function checkCache(itemPath, rootPath){
+  const itemPathFull = rootPath +'/'+itemPath;
+  const itemPathSub = itemPath.replace(`${rootPath}/`, '');
+  let isCached = true;
+  if(cache[itemPathSub]){
+    if(Number(cache[itemPathSub].mtime) !== Number(fs.lstatSync(itemPathFull).mtime)){
+      isCached = false;
+    }
+  }
+  else{
+    isCached = false;
+  }
+  if(isCached){
+    cache[itemPathSub] = {};
+    cache[itemPathSub].mtime = Number(fs.lstatSync(itemPathFull).mtime);
+  }
+  //console.log(isNew);
+  return isCached;
 }
 
 function convert(fileLoc){
   const parsed = path.parse(fileLoc);
+  const noExt = parsed.dir + '/' + parsed.name;
   let ext = parsed.ext;
   parsed.originalExt = ext;
   let html;
   let metaJSON = {};
-  if(ext === '.md'){
-    let file = fs.readFileSync(sourcePath+'/'+fileLoc,'utf-8');
-    ext = '.html';
-    parsed.ext = '.html';
-    // Parse meta data
-    if(file.substring(0,10)==='<steelsky>'){
-      let meta = file.split('</steelsky>')[0];
-      meta = meta.replace('<steelsky>','');
-      metaJSON = JSON.parse(meta);
-      file = file.replace('<steelsky>','<script>const ssmeta=');
-      file = file.replace('</steelsky>',';</script>');
+  const isCached = checkCache(fileLoc, sourcePath);
+  if(isCached){
+    if(ext === '.md'){
+      let file = fs.readFileSync(sourcePath+'/'+fileLoc,'utf-8');
+      ext = '.html';
+      parsed.ext = '.html';
+      // Parse meta data
+      if(file.substring(0,10)==='<steelsky>'){
+        let meta = file.split('</steelsky>')[0];
+        meta = meta.replace('<steelsky>','');
+        metaJSON = JSON.parse(meta);
+        file = file.replace('<steelsky>','<script>const ssmeta=');
+        file = file.replace('</steelsky>',';</script>');
+      }
+      html = header + '<style>' + highlightStyleCSS +'</style>' + '<style>' + theme +'</style><div class="ss-content">' + converter.makeHtml(file) +'</div>'+ footer;
     }
-    html = header + '<style>' + highlightStyleCSS +'</style>' + '<style>' + theme +'</style><div class="ss-content">' + converter.makeHtml(file) +'</div>'+ footer;
-  }
-  const noExt = parsed.dir + '/' + parsed.name;
-  const writeLoc = outPath+'/'+noExt+ext;
-  const realPath = path.parse(writeLoc).dir;
-  if (!fs.existsSync(realPath)){
-    console.log('New Dir: '+realPath);
-    fs.mkdirSync(realPath, {recursive: true});
-  }
-  if(parsed.originalExt === '.md'){
-    fs.writeFileSync(writeLoc, html, {encoding: 'utf-8'});
-  }else{
-    fs.copyFileSync(sourcePath+ '/' + fileLoc, outPath+'/'+fileLoc);
-  }
-  if(noExt[0]==='/'){
-    noExt[0]='';
+    
+    const writeLoc = outPath+'/'+noExt+ext;
+    const realPath = path.parse(writeLoc).dir;
+    if (!fs.existsSync(realPath)){
+      console.log('New Dir: '+realPath);
+      fs.mkdirSync(realPath, {recursive: true});
+    }
+    if(parsed.originalExt === '.md'){
+      fs.writeFileSync(writeLoc, html, {encoding: 'utf-8'});
+    }else{
+      fs.copyFileSync(sourcePath+ '/' + fileLoc, outPath+'/'+fileLoc);
+    }
+    if(noExt[0]==='/'){
+      noExt[0]='';
+    }
   }
   const listingLoc = noExt.replace(/^\/+/g, '')+ext;//Remove leading slash
   let outListData = {
@@ -116,10 +126,11 @@ function convert(fileLoc){
     outListData.meta = metaJSON;
   }
   outList.push(outListData);
+  return isCached ? "" : fileLoc;
 }
 
 const list = traverse(sourcePath, sourcePath);
-console.log(list);
+//console.log(list);
 
 if (!fs.existsSync(outPath)){
   console.log('Create Out Directory');
@@ -127,11 +138,21 @@ if (!fs.existsSync(outPath)){
 }
 
 let outList = [];
+let processed = 0;
+let total = 0;
 for(let item of list){
-  convert(item);
+  total++;
+  const res = convert(item);
+  if(res !== ""){
+    console.log("+ "+res);
+    processed++;
+  }
 }
+console.log('Processed: '+processed+'/'+total);
 
-fs.writeFileSync(outPath+'/listing.json', JSON.stringify(outList, null, 2));
+fs.writeFileSync(process.cwd()+'/cache.json', JSON.stringify(cache,null,2));
+
+fs.writeFileSync(outPath+'/listing.json', JSON.stringify(outList,null,2));
 
 fs.copyFileSync(__dirname+'/resources/ssList.js', outPath+'/ssList.js');
 

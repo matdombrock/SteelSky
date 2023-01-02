@@ -74,9 +74,6 @@ function checkCache(itemPath, rootPath){
     cache[itemPathSub] = {};
     cache[itemPathSub].mtime = Number(fs.lstatSync(itemPathFull).mtime);
   }
-  else{
-    console.log(Number(fs.lstatSync(itemPathFull).mtime));
-  }
   
   return isCached;
 }

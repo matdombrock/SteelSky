@@ -35,7 +35,7 @@ let converter = new showdown.Converter({
 });
 
 let cache;
-if(fs.existsSync(process.cwd()+'/cache.json')){
+if(fs.existsSync(process.cwd()+'/cache.json') && process.argv[2] !== '-f'){
   cache = require(process.cwd()+'/cache.json');
 }
 else{

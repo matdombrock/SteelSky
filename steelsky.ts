@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import showdown from "showdown";
 import showdownHighlight from "showdown-highlight";
 import fs from 'fs';

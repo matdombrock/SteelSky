@@ -19,5 +19,9 @@
   "dependencies": {
     "showdown": "^1.9.1",
     "showdown-highlight": "^2.1.7"
+  },
+  "devDependencies": {
+    "@types/node": "^18.16.3",
+    "@types/showdown": "^2.0.1"
   }
 }

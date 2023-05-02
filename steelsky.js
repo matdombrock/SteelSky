@@ -36,7 +36,7 @@ class Sections {
         this.headerHTML = fs_1.default.readFileSync(lp + '/header.html', 'utf-8');
         this.footerHTML = fs_1.default.readFileSync(lp + '/footer.html', 'utf-8');
         this.themeCSS = fs_1.default.readFileSync(lp + '/theme.css', 'utf-8');
-        this.headerHTML = fs_1.default.readFileSync(__dirname + '/node_modules/highlight.js/styles/' + highlightStyle + '.css', 'utf-8');
+        this.highlightCSS = fs_1.default.readFileSync(__dirname + '/node_modules/highlight.js/styles/' + highlightStyle + '.css', 'utf-8');
     }
 }
 class SteelSky {

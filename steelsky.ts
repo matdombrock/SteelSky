@@ -33,7 +33,7 @@ class Sections{
         this.headerHTML = fs.readFileSync(lp+'/header.html', 'utf-8');
         this.footerHTML = fs.readFileSync(lp+'/footer.html', 'utf-8');
         this.themeCSS = fs.readFileSync(lp+'/theme.css', 'utf-8');
-        this.headerHTML = fs.readFileSync(__dirname+'/node_modules/highlight.js/styles/'+highlightStyle+'.css','utf-8');
+        this.highlightCSS = fs.readFileSync(__dirname+'/node_modules/highlight.js/styles/'+highlightStyle+'.css','utf-8');
     }
 }
 

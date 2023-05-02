@@ -2,8 +2,7 @@
 import showdown from "showdown";
 import showdownHighlight from "showdown-highlight";
 import fs from 'fs';
-import path, { parse } from 'path';
-
+import path from 'path';
 
 class Config{
     sourcePath: string = './';
@@ -37,6 +36,7 @@ class Sections{
         this.headerHTML = fs.readFileSync(__dirname+'/node_modules/highlight.js/styles/'+highlightStyle+'.css','utf-8');
     }
 }
+
 interface OutMeta{
     processed:number;
     total:number;

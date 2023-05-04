@@ -2,10 +2,10 @@
   "name": "steelsky",
   "version": "2.1.0",
   "description": "A *very* lightweight, no BS static site generator written in NodeJS.",
-  "main": "steelsky.js",
+  "main": "cli.js",
   "type": "commonjs",
   "bin": {
-    "steelsky": "./steelsky.js"
+    "steelsky": "./cli.js"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

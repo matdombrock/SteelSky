@@ -9,14 +9,15 @@ const showdown_highlight_1 = __importDefault(require("showdown-highlight"));
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 class Config {
+    // Loads config file
     constructor() {
         this.sourcePath = './';
         this.layoutPath = './';
         this.highlightStyle = './';
         this.outPath = './build/';
         if (!fs_1.default.existsSync('./sscfg.json')) {
-            throw 'No Config ./sscfg.json';
-            return;
+            console.log('Error: Missing config: ./sscfg.json');
+            process.exit();
         }
         const cfgRaw = fs_1.default.readFileSync('./sscfg.json', 'utf-8');
         const parsed = JSON.parse(cfgRaw);
@@ -55,11 +56,49 @@ class SteelSky {
             tables: true
         });
     }
-    run() {
+    //
+    // Public methods
+    //
+    build(options) {
+        //
+        if (options.target) {
+            const isDirectory = fs_1.default.lstatSync(options.target).isDirectory();
+            if (!fs_1.default.existsSync(options.target)) {
+                console.log('Error: Target is not a directory: ' + options.target);
+                process.exit();
+            }
+            this.cfg.sourcePath = options.target;
+            if (isDirectory) {
+                // Change the cfg source dir
+                this.buildDir();
+                return;
+            }
+            else {
+                this.buildFile();
+                return;
+            }
+        }
+        this.buildDir();
+    }
+    watch() {
+        //
+    }
+    //
+    // Private methods
+    //
+    buildFile() {
+        this.loadListing();
+        this.convert(this.cfg.sourcePath);
+        this.writeMeta();
+    }
+    buildDir() {
+        console.log('Building from source dir:');
+        console.log(this.cfg.sourcePath);
         const list = this.traverse(this.cfg.sourcePath, this.cfg.sourcePath);
         //console.log(list);
         if (!fs_1.default.existsSync(this.cfg.outPath)) {
-            console.log('Create Out Directory');
+            console.log('Creating out directory:');
+            console.log(this.cfg.outPath);
             fs_1.default.mkdirSync(this.cfg.outPath, { recursive: true });
         }
         for (let item of list) {
@@ -74,10 +113,9 @@ class SteelSky {
             + this.outMeta.processed
             + '/'
             + this.outMeta.total);
-        //fs.writeFileSync('./cache.json', JSON.stringify(cache,null,2));
-        fs_1.default.writeFileSync(this.cfg.outPath + '/listing.json', JSON.stringify(this.outList, null, 2));
-        fs_1.default.copyFileSync(__dirname + '/resources/ssList.js', this.cfg.outPath + '/ssList.js');
+        this.writeMeta();
     }
+    // Returns a list of all files in the target directory
     traverse(path, rootPath, list = []) {
         const listing = fs_1.default.readdirSync(path);
         for (let item of listing) {
@@ -140,8 +178,28 @@ class SteelSky {
         if (originalExt === '.md') {
             outListData.meta = metaJSON;
         }
-        this.outList.push(outListData);
+        // Check for existing entries
+        let existing = false;
+        for (let [index, item] of this.outList.entries()) {
+            if (item.path === outListData.path) {
+                this.outList[index] = outListData;
+                existing = true;
+            }
+        }
+        if (existing === false) {
+            this.outList.push(outListData);
+        }
         return fileLoc;
+    }
+    // Loads the listing from a listing file so it can be appended
+    loadListing() {
+        const listingPath = this.cfg.outPath + '/listing.json';
+        if (!fs_1.default.existsSync(listingPath)) {
+            console.log('Warning: No listing file found');
+            return;
+        }
+        const listingRaw = fs_1.default.readFileSync(listingPath, 'utf-8');
+        this.outList = JSON.parse(listingRaw);
     }
     buildHTML(file) {
         const html = this.sections.headerHTML
@@ -156,6 +214,11 @@ class SteelSky {
             + this.sections.footerHTML;
         return html;
     }
+    writeMeta() {
+        // Write the listing data
+        fs_1.default.writeFileSync(this.cfg.outPath + '/listing.json', JSON.stringify(this.outList, null, 2));
+        // Copy the ssList file
+        fs_1.default.copyFileSync(__dirname + '/resources/ssList.js', this.cfg.outPath + '/ssList.js');
+    }
 }
-const ss = new SteelSky;
-ss.run();
+exports.default = SteelSky;

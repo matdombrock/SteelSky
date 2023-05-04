@@ -4,11 +4,6 @@ A *very* lightweight, no BS static site generator written in NodeJS.
 
 Automatically converts an arbitrary directory structure containing markdown and other static assets into a static site with no external dependencies. 
 
-## Install
-```
-npm install steelsky
-```
-
 ## Features
 * Handles bulk conversion of Markdown files to HTMl
 * Preserves original arbitrary directory structure
@@ -17,17 +12,72 @@ npm install steelsky
   * Add your own front-end frameworks!
 * No lock-in
   * Your original markdown files stay perfectly intact and portable
+* Automatically generates a JSON site index file
+  * Useful for site searches ect.
 * Generated files have no external dependencies and can work fully offline
-* Under 100 lines of code
+* As minimalist as possible while remaining functional and modern
 
 ## Depends On
 
 * Showdown
 * Showdown-highlight
 
-## Example
+## Install
+```
+npm install steelsky
+```
 
-See the [SteelSky Example Project Repo](https://github.com/matdombrock/SteelSkyExample) for an example of how to get started.
+## Initialize
+You can init a new SteelSky project in an empty directory like this:
+```
+steelsky init
+``` 
+
+## How it Works
+A basic SteelSky directory structure looks like this:
+```
+root/
+--sscfg.json
+--source/
+----PageA.md
+----PageB.md
+----PageC.html
+----Images/
+------Image.jpg
+---- ...
+--layout/
+----header.html
+----footer.html
+----theme.css
+--build/
+---- ...
+```
+
+When you run the `steelsky` command you will get some output in your `./build` directory like this:
+```
+build/
+--PageA.md
+--PageB.md
+--PageC.html
+--Images/
+----Image.jpg
+-- ...
+```
+
+These files can be served with any web server software you want. Such as Apache or NGinx.
+
+## Config
+SteelSky uses a very simple config file:
+```json
+{
+    "sourcePath": "./source",
+    "layoutPath": "./layout",
+    "highlightStyle": "monokai-sublime",
+    "outPath": "./build/"
+}
+```
+
+Each property is required and there are no other properties which are not listed here.
 
 ## Why did I write this? 
 Over the years I've had my site running on several different systems. Off the top of my head:

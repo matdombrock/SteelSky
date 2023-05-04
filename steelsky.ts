@@ -9,10 +9,11 @@ class Config{
     layoutPath: string = './';
     highlightStyle: string = './';
     outPath: string = './build/';
+    // Loads config file
     constructor(){
         if(!fs.existsSync('./sscfg.json')){
-            throw 'No Config ./sscfg.json';
-            return;
+            console.log('Error: Missing config: ./sscfg.json');
+            process.exit();
         }
         const cfgRaw: string = fs.readFileSync('./sscfg.json', 'utf-8');
         const parsed:any = JSON.parse(cfgRaw);
@@ -50,11 +51,11 @@ interface ListData{
 }
 
 class SteelSky{
-    cfg: Config = new Config;
-    sections: Sections;
-    converter: showdown.Converter;
-    outList:Array<ListData> = [];
-    outMeta:OutMeta = {
+    private cfg: Config = new Config;
+    private sections: Sections;
+    private converter: showdown.Converter;
+    private outList:Array<ListData> = [];
+    private outMeta:OutMeta = {
         processed:0,
         total:0,
     };
@@ -67,17 +68,49 @@ class SteelSky{
             tables: true
         });
     }
-    run():void{
+    //
+    // Public methods
+    //
+    public build(options:any):void{
+        //
+        if(options.target){
+            const isDirectory:boolean = fs.lstatSync(options.target).isDirectory();
+            if(!fs.existsSync(options.target)){
+                console.log('Error: Target is not a directory: '+options.target);
+                process.exit();
+            }
+            this.cfg.sourcePath = options.target;
+            if(isDirectory){
+                // Change the cfg source dir
+                this.buildDir();
+                return;
+            }
+            else{
+                this.buildFile();
+                return;
+            }
+        }
+        this.buildDir();
+    }
+    public watch():void{
         //
     }
-    buildOne():void{
-        //
+    //
+    // Private methods
+    //
+    private buildFile():void{
+        this.loadListing();
+        this.convert(this.cfg.sourcePath);
+        this.writeMeta();
     }
-    buildAll():void{
+    private buildDir():void{
+        console.log('Building from source dir:');
+        console.log(this.cfg.sourcePath);
         const list = this.traverse(this.cfg.sourcePath, this.cfg.sourcePath);
         //console.log(list);
         if (!fs.existsSync(this.cfg.outPath)){
-            console.log('Create Out Directory');
+            console.log('Creating out directory:');
+            console.log(this.cfg.outPath);
             fs.mkdirSync(this.cfg.outPath, {recursive: true});
         }
         for(let item of list){
@@ -94,13 +127,10 @@ class SteelSky{
             +'/'
             +this.outMeta.total
         );
-        // Write the listing data
-        fs.writeFileSync(this.cfg.outPath+'/listing.json', JSON.stringify(this.outList,null,2));
-        // Copy the ssList file
-        fs.copyFileSync(__dirname+'/resources/ssList.js', this.cfg.outPath+'/ssList.js');
+        this.writeMeta();
     }
     // Returns a list of all files in the target directory
-    traverse(path:string, rootPath:string, list:Array<string>=[]):Array<string>{
+    private traverse(path:string, rootPath:string, list:Array<string>=[]):Array<string>{
         const listing: Array<string> = fs.readdirSync(path);
         for(let item of listing){
             let itemPath: string = `${path}/${item}`;
@@ -115,7 +145,7 @@ class SteelSky{
         }
         return list;
     }
-    convert(fileLoc:string):string{
+    private convert(fileLoc:string):string{
         let parsed: path.ParsedPath = path.parse(fileLoc);
         let noExt:string = parsed.dir + '/' + parsed.name;
         let ext:string = parsed.ext;
@@ -165,10 +195,30 @@ class SteelSky{
         if(originalExt === '.md'){
             outListData.meta = metaJSON;
         }
-        this.outList.push(outListData);
+        // Check for existing entries
+        let existing:boolean = false;
+        for(let [index, item] of this.outList.entries()){
+            if(item.path === outListData.path){
+                this.outList[index] = outListData;
+                existing = true;
+            }
+        }
+        if(existing === false){
+            this.outList.push(outListData);
+        }
         return fileLoc;
     }
-    buildHTML(file:string): string{
+    // Loads the listing from a listing file so it can be appended
+    private loadListing():void{
+        const listingPath:string = this.cfg.outPath+'/listing.json';
+        if(!fs.existsSync(listingPath)){
+            console.log('Warning: No listing file found');
+            return;
+        }
+        const listingRaw:string = fs.readFileSync(listingPath, 'utf-8');
+        this.outList = JSON.parse(listingRaw);
+    }
+    private buildHTML(file:string): string{
         const html = this.sections.headerHTML 
         + '<style>' 
         + this.sections.highlightCSS 
@@ -180,6 +230,12 @@ class SteelSky{
         +'</div>'
         + this.sections.footerHTML;
         return html;
+    }
+    private writeMeta():void{
+        // Write the listing data
+        fs.writeFileSync(this.cfg.outPath+'/listing.json', JSON.stringify(this.outList,null,2));
+        // Copy the ssList file
+        fs.copyFileSync(__dirname+'/resources/ssList.js', this.cfg.outPath+'/ssList.js');
     }
 }
 

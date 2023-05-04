@@ -67,7 +67,13 @@ class SteelSky{
             tables: true
         });
     }
-    run(){
+    run():void{
+        //
+    }
+    buildOne():void{
+        //
+    }
+    buildAll():void{
         const list = this.traverse(this.cfg.sourcePath, this.cfg.sourcePath);
         //console.log(list);
         if (!fs.existsSync(this.cfg.outPath)){
@@ -88,10 +94,12 @@ class SteelSky{
             +'/'
             +this.outMeta.total
         );
-        //fs.writeFileSync('./cache.json', JSON.stringify(cache,null,2));
+        // Write the listing data
         fs.writeFileSync(this.cfg.outPath+'/listing.json', JSON.stringify(this.outList,null,2));
+        // Copy the ssList file
         fs.copyFileSync(__dirname+'/resources/ssList.js', this.cfg.outPath+'/ssList.js');
     }
+    // Returns a list of all files in the target directory
     traverse(path:string, rootPath:string, list:Array<string>=[]):Array<string>{
         const listing: Array<string> = fs.readdirSync(path);
         for(let item of listing){
@@ -175,5 +183,4 @@ class SteelSky{
     }
 }
 
-const ss:SteelSky = new SteelSky;
-ss.run();
+export default SteelSky;

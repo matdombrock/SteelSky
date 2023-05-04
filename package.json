@@ -18,6 +18,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "commander": "^10.0.1",
     "showdown": "^1.9.1",
     "showdown-highlight": "^2.1.7"
   },

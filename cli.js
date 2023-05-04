@@ -22,15 +22,17 @@ console.log(`
 `);
 program
     .name('steelsky')
-    .description(`				
+    .description(`			
+SteelSky v${getPkgVer_js_1.default}	
 A dead simple static site generator. 
-v${getPkgVer_js_1.default}
+
+GPL3 | Mathieu Dombrock 2023
 `)
     //.helpOption(false)
     //.addHelpCommand(false)
     //.addHelpText('after','\nNote: All commands are prefixed with "." to avoid conflicting with prompts!')
     .showHelpAfterError('Use `steelsky --help` or `steeksky [cmd] --help` for more info.')
-    .version(getPkgVer_js_1.default);
+    .version('v' + getPkgVer_js_1.default);
 program
     .command('help')
     .description('show help')

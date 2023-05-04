@@ -20,16 +20,18 @@ console.log(`
 
 program
 	.name('steelsky')
-	.description(`				
+	.description(`			
+SteelSky v${VERSION_NUMBER}	
 A dead simple static site generator. 
-v${VERSION_NUMBER}
+
+GPL3 | Mathieu Dombrock 2023
 `
 	)
 	//.helpOption(false)
 	//.addHelpCommand(false)
 	//.addHelpText('after','\nNote: All commands are prefixed with "." to avoid conflicting with prompts!')
 	.showHelpAfterError('Use `steelsky --help` or `steeksky [cmd] --help` for more info.')
-	.version(VERSION_NUMBER);
+	.version('v'+VERSION_NUMBER);
 
 program
 	.command('help')

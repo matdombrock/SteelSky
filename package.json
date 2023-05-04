@@ -1,6 +1,6 @@
 {
   "name": "steelsky",
-  "version": "2.1.0",
+  "version": "3.0.0",
   "description": "A *very* lightweight, no BS static site generator written in NodeJS.",
   "main": "cli.js",
   "type": "commonjs",

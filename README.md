@@ -79,6 +79,24 @@ SteelSky uses a very simple config file:
 
 Each property is required and there are no other properties which are not listed here.
 
+## Meta Data
+Each markdown file in your source directory can optionally contain a SteelSky meta element.
+```
+<steelsky>
+{
+  "title":"Home",
+  "description":"The home page."
+}
+</steelsky>
+```
+This can contain *any valid JSON data* but it usually has the following properties:
+- title
+- description
+
+This JSON object is added into the `meta` property of this pages entry in the automatically generated `listing.json` file. This data is also available to any JS running on the page itself via the `ssmeta` object which is automatically added to any page with this meta element.
+
+**Note: Ensure that you have valid JSON here or you will cause JS errors when your page is rendered by the browser!**
+
 ## Why did I write this? 
 Over the years I've had my site running on several different systems. Off the top of my head:
 * Wordpress

@@ -8,18 +8,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
     Commander Setup
 */
 const commander_1 = require("commander"); // (normal include);
-const steelsky_js_1 = __importDefault(require("./steelsky.js"));
-const ssMeta_js_1 = __importDefault(require("./ssMeta.js"));
+const SteelSky_js_1 = __importDefault(require("./SteelSky.js"));
+const SSInit_js_1 = __importDefault(require("./SSInit.js"));
+const SSWatch_js_1 = __importDefault(require("./SSWatch.js"));
 const getPkgVer_js_1 = __importDefault(require("./util/getPkgVer.js"));
+const ascii_js_1 = __importDefault(require("./util/ascii.js"));
 const program = new commander_1.Command();
-console.log(`
-   _____ __            _______ __        
-  / ___// /____  ___  / / ___// /____  __
-  \\__ \\/ __/ _ \\/ _ \\/ /\\__ \\/ //_/ / / /
- ___/ / /_/  __/  __/ /___/ / ,< / /_/ / 
-/____/\\__/\\___/\\___/_//____/_/|_|\\__, /  
-                                /____/   
-`);
+console.log(ascii_js_1.default);
 program
     .name('steelsky')
     .description(`			
@@ -31,7 +26,7 @@ GPL3 | Mathieu Dombrock 2023
     //.helpOption(false)
     //.addHelpCommand(false)
     //.addHelpText('after','\nNote: All commands are prefixed with "." to avoid conflicting with prompts!')
-    .showHelpAfterError('Use `steelsky --help` or `steeksky [cmd] --help` for more info.')
+    .showHelpAfterError('Use `steelsky --help` or `steelsky [cmd] --help` for more info.')
     .version('v' + getPkgVer_js_1.default);
 program
     .command('help')
@@ -46,22 +41,22 @@ program
     .option('-t, --target <path>', 'build the target file or directory')
     .option('-l, --layout', 'only rebuild the layout files')
     .action((options) => {
-    const ss = new steelsky_js_1.default;
+    const ss = new SteelSky_js_1.default;
     ss.build(options);
 });
 program
     .command('watch')
     .description('watch for changes and build files')
     .action(() => {
-    const ss = new steelsky_js_1.default;
-    ss.watch();
+    const ssWatch = new SSWatch_js_1.default;
+    ssWatch.watch();
 });
 program
     .command('init')
     .description('initialize a new steelsky project')
     .option('-m, --minimal', 'dont add example source files')
     .action((options) => {
-    const ssMeta = new ssMeta_js_1.default;
-    ssMeta.init(options);
+    const ssInit = new SSInit_js_1.default;
+    ssInit.init(options);
 });
 program.parse();

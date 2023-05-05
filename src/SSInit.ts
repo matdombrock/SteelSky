@@ -1,25 +1,20 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-const fs_1 = __importDefault(require("fs"));
-class SSMeta {
-    init(options) {
-        if (fs_1.default.existsSync('./sscfg.json')) {
+import fs from 'fs';
+class SSInit{
+    public init(options:any):void{
+        if(fs.existsSync('./sscfg.json')){
             console.log('Error: This directory already contains SteelSky files');
             console.log('If you want to re-initialize this directory please delete the sscfg.json file!');
             console.log('Aborting init');
             process.exit();
         }
         this.cp('sscfg.json');
-        fs_1.default.mkdirSync('./layout');
+        fs.mkdirSync('./layout');
         this.cp('layout/header.html');
         this.cp('layout/footer.html');
         this.cp('layout/theme.css');
-        fs_1.default.mkdirSync('./source');
+        fs.mkdirSync('./source');
         this.cp('source/index.md');
-        if (options.minimal) {
+        if(options.minimal){
             // Dont copy the rest of the files
             return;
         }
@@ -32,8 +27,9 @@ class SSMeta {
         this.cp('source/blob');
         this.cp('source/favicon.ico');
     }
-    cp(target) {
-        fs_1.default.copyFileSync(__dirname + '/resources/init/' + target, './' + target);
+    private cp(target:string):void{
+        fs.copyFileSync(__dirname+'/../resources/init/'+target, './'+target);
     }
 }
-exports.default = SSMeta;
+
+export default SSInit;

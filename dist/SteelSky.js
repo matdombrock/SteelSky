@@ -8,47 +8,17 @@ const showdown_1 = __importDefault(require("showdown"));
 const showdown_highlight_1 = __importDefault(require("showdown-highlight"));
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
-class Config {
-    // Loads config file
-    constructor() {
-        this.sourcePath = './';
-        this.layoutPath = './';
-        this.highlightStyle = './';
-        this.outPath = './build/';
-        if (!fs_1.default.existsSync('./sscfg.json')) {
-            console.log('Error: Missing config: ./sscfg.json');
-            process.exit();
-        }
-        const cfgRaw = fs_1.default.readFileSync('./sscfg.json', 'utf-8');
-        const parsed = JSON.parse(cfgRaw);
-        this.sourcePath = parsed.sourcePath;
-        this.layoutPath = parsed.layoutPath;
-        this.highlightStyle = parsed.highlightStyle;
-        this.outPath = parsed.outPath;
-    }
-}
-class Sections {
-    constructor(layoutPath, highlightStyle) {
-        this.headerHTML = '';
-        this.footerHTML = '';
-        this.themeCSS = '';
-        this.highlightCSS = '';
-        const lp = layoutPath;
-        this.headerHTML = fs_1.default.readFileSync(lp + '/header.html', 'utf-8');
-        this.footerHTML = fs_1.default.readFileSync(lp + '/footer.html', 'utf-8');
-        this.themeCSS = fs_1.default.readFileSync(lp + '/theme.css', 'utf-8');
-        this.highlightCSS = fs_1.default.readFileSync(__dirname + '/node_modules/highlight.js/styles/' + highlightStyle + '.css', 'utf-8');
-    }
-}
+const Config_js_1 = __importDefault(require("./Config.js"));
+const RenderSections_js_1 = __importDefault(require("./RenderSections.js"));
 class SteelSky {
     constructor() {
-        this.cfg = new Config;
-        this.outList = [];
+        this.cfg = new Config_js_1.default;
+        this.outListing = [];
         this.outMeta = {
             processed: 0,
             total: 0,
         };
-        this.sections = new Sections(this.cfg.layoutPath, this.cfg.highlightStyle);
+        this.sections = new RenderSections_js_1.default(this.cfg.layoutPath, this.cfg.highlightStyle);
         this.converter = new showdown_1.default.Converter({
             extensions: [(0, showdown_highlight_1.default)({
                     pre: true
@@ -62,19 +32,20 @@ class SteelSky {
     build(options) {
         //
         if (options.target) {
-            const isDirectory = fs_1.default.lstatSync(options.target).isDirectory();
-            if (!fs_1.default.existsSync(options.target)) {
-                console.log('Error: Target is not a directory: ' + options.target);
+            // Targets should always be in configured source dir
+            const targetPath = this.cfg.sourcePath + '/' + options.target;
+            if (!fs_1.default.existsSync(targetPath)) {
+                console.log('Error: Target not found source dir: ' + options.target);
                 process.exit();
             }
-            this.cfg.sourcePath = options.target;
+            const isDirectory = fs_1.default.lstatSync(targetPath).isDirectory();
             if (isDirectory) {
                 // Change the cfg source dir
                 this.buildDir();
                 return;
             }
             else {
-                this.buildFile();
+                this.buildFile(options.target);
                 return;
             }
         }
@@ -86,9 +57,11 @@ class SteelSky {
     //
     // Private methods
     //
-    buildFile() {
+    buildFile(target) {
+        console.log('Building a single file:');
+        console.log(target);
         this.loadListing();
-        this.convert(this.cfg.sourcePath);
+        this.convert(target);
         this.writeMeta();
     }
     buildDir() {
@@ -169,25 +142,25 @@ class SteelSky {
             noExt = noExt.substring(0);
         }
         const listingLoc = noExt.replace(/^\/+/g, '') + ext; //Remove leading slash
-        let outListData = {
+        let outListing = {
             path: parsed,
             location: listingLoc,
             meta: {},
             originalExt: originalExt
         };
         if (originalExt === '.md') {
-            outListData.meta = metaJSON;
+            outListing.meta = metaJSON;
         }
         // Check for existing entries
         let existing = false;
-        for (let [index, item] of this.outList.entries()) {
-            if (item.path === outListData.path) {
-                this.outList[index] = outListData;
+        for (let [index, item] of this.outListing.entries()) {
+            if (item.path === outListing.path) {
+                this.outListing[index] = outListing;
                 existing = true;
             }
         }
         if (existing === false) {
-            this.outList.push(outListData);
+            this.outListing.push(outListing);
         }
         return fileLoc;
     }
@@ -199,7 +172,7 @@ class SteelSky {
             return;
         }
         const listingRaw = fs_1.default.readFileSync(listingPath, 'utf-8');
-        this.outList = JSON.parse(listingRaw);
+        this.outListing = JSON.parse(listingRaw);
     }
     buildHTML(file) {
         const html = this.sections.headerHTML
@@ -216,9 +189,9 @@ class SteelSky {
     }
     writeMeta() {
         // Write the listing data
-        fs_1.default.writeFileSync(this.cfg.outPath + '/listing.json', JSON.stringify(this.outList, null, 2));
+        fs_1.default.writeFileSync(this.cfg.outPath + '/listing.json', JSON.stringify(this.outListing, null, 2));
         // Copy the ssList file
-        fs_1.default.copyFileSync(__dirname + '/resources/ssList.js', this.cfg.outPath + '/ssList.js');
+        fs_1.default.copyFileSync(__dirname + '/../resources/ssList.js', this.cfg.outPath + '/ssList.js');
     }
 }
 exports.default = SteelSky;

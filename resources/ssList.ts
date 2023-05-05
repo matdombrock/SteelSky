@@ -1,7 +1,7 @@
-import path from 'path';
 
+// Same as the main ListItem class but without a path import
 interface ListItem{
-    path: path.ParsedPath;
+    path: any;
     location:string;
     originalExt:string;
     meta:any;

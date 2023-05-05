@@ -1,5 +1,4 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 class Elements {
     constructor() {
         // Process should fail if these are not found

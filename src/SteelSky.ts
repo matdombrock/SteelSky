@@ -4,7 +4,7 @@ import showdownHighlight from "showdown-highlight";
 import fs from 'fs';
 import path from 'path';
 
-import ListItem from './Listing.js';
+import ListItem from './ListItem.js';
 import Config from './Config.js';
 import RenderSections from './RenderSections.js';
 

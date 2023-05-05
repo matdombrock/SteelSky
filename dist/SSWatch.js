@@ -16,31 +16,37 @@ class SSWatch {
     watch() {
         this.watcher
             .on('add', (path) => { this.add(this, path); })
-            .on('change', this.change)
-            .on('unlink', this.unlink)
+            .on('change', (path) => { this.change(this, path); })
+            .on('unlink', (path) => { this.change(this, path); })
             .on('error', this.error);
     }
-    add(self, path) {
-        path = SSWatch.rmSource(path, self.sourcePath);
+    add(ssWatch, path) {
+        path = ssWatch.rmSource(path);
         console.log('Found: ' + path);
-        //this.ss.build({target: path});
+        this.ss.build({ target: path });
     }
-    change(path) {
+    change(ssWatch, path) {
         console.log('Changed: ' + path);
     }
-    unlink(path) {
+    unlink(ssWatch, path) {
         console.log('Unlinked: ' + path);
     }
     error(error) {
+        console.log(error);
     }
-    static rmSource(path, sourcePath) {
+    rmSource(path) {
+        let sourcePath = this.ss.cfg.sourcePath;
         if (sourcePath[0] === '.') {
             sourcePath = sourcePath.substring(1);
         }
         if (sourcePath[0] === '/') {
             sourcePath = sourcePath.substring(1);
         }
-        return path.replace(sourcePath, '');
+        path = path.replace(sourcePath, '');
+        if (path[0] === '/') {
+            path = path.substring(1);
+        }
+        return path;
     }
 }
 exports.default = SSWatch;

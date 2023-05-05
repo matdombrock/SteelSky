@@ -13,32 +13,40 @@ class SSWatch{
     watch():void{
         this.watcher
             .on('add', (path:string)=>{this.add(this, path)})
-            .on('change', this.change)
-            .on('unlink', this.unlink)
+            .on('change', (path:string)=>{this.change(this, path)})
+            .on('unlink', (path:string)=>{this.change(this, path)})
             .on('error', this.error)
     }
-    add(self:SSWatch, path:string):void{
-        path = SSWatch.rmSource(path, self.sourcePath);
+    add(ssWatch:SSWatch, path:string):void{
+        path = ssWatch.rmSource(path);
         console.log('Found: '+path);
-        //this.ss.build({target: path});
+        this.ss.build({target: path});
     }
-    change(path:string):void{
+    change(ssWatch:SSWatch, path:string):void{
         console.log('Changed: '+path);
+        this.ss.build({target: path});
     }
-    unlink(path:string):void{
+    unlink(ssWatch:SSWatch, path:string):void{
         console.log('Unlinked: '+path);
+        console.log('No build action taken...');
+        // this should remove from listing.json 
     }
     error(error:string):void{
-
+        console.log(error);
     }
-    static rmSource(path:string, sourcePath:string):string{
+    rmSource(path:string):string{
+        let sourcePath:string = this.ss.cfg.sourcePath;
         if(sourcePath[0] === '.'){
             sourcePath = sourcePath.substring(1);
         }
         if(sourcePath[0] === '/'){
             sourcePath = sourcePath.substring(1);
         }
-        return path.replace(sourcePath, '');
+        path = path.replace(sourcePath, '');
+        if(path[0] === '/'){
+            path = path.substring(1);
+        }
+        return path;
     }
 }
 export default SSWatch;

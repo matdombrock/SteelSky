@@ -27,6 +27,25 @@ class SSInit{
         this.cp('source/blob');
         this.cp('source/favicon.ico');
     }
+    public page(name:string):void{
+        if(fs.existsSync(name+'.md')){
+            console.log('Error: File '+name+'.md already exists!');
+            process.exit();
+        }
+        let md: string = '';
+        const meta:any = {
+            title: name,
+            description: 'A new page.',
+            date: new Date().toISOString().split('T')[0]
+        }
+        md += JSON.stringify(meta, null, 2);
+        md += '\r\n';
+        md += '# '+name;
+        md += '\r\n';
+        md += 'Some example content';
+        fs.writeFileSync('./'+name+'.md', md);
+        console.log('Created a new page: '+name+'.md');
+    }
     private cp(target:string):void{
         fs.copyFileSync(__dirname+'/../resources/init/'+target, './'+target);
     }

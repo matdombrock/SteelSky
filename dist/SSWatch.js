@@ -27,9 +27,12 @@ class SSWatch {
     }
     change(ssWatch, path) {
         console.log('Changed: ' + path);
+        this.ss.build({ target: path });
     }
     unlink(ssWatch, path) {
         console.log('Unlinked: ' + path);
+        console.log('No build action taken...');
+        // this should remove from listing.json 
     }
     error(error) {
         console.log(error);

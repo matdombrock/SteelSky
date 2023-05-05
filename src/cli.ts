@@ -62,4 +62,13 @@ program
 		ssInit.init(options);
 	});
 
+program
+	.command('page')
+	.description('create a new steelsky page in the current directory')
+	.argument('<name>', 'the name of the page to create')
+	.action((name)=>{
+        const ssInit:SSInit = new SSInit;
+		ssInit.page(name);
+	});
+
 program.parse();

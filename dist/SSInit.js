@@ -32,6 +32,25 @@ class SSInit {
         this.cp('source/blob');
         this.cp('source/favicon.ico');
     }
+    page(name) {
+        if (fs_1.default.existsSync(name + '.md')) {
+            console.log('Error: File ' + name + '.md already exists!');
+            process.exit();
+        }
+        let md = '';
+        const meta = {
+            title: name,
+            description: 'A new page.',
+            date: new Date().toISOString().split('T')[0]
+        };
+        md += JSON.stringify(meta, null, 2);
+        md += '\r\n';
+        md += '# ' + name;
+        md += '\r\n';
+        md += 'Some example content';
+        fs_1.default.writeFileSync('./' + name + '.md', md);
+        console.log('Created a new page: ' + name + '.md');
+    }
     cp(target) {
         fs_1.default.copyFileSync(__dirname + '/../resources/init/' + target, './' + target);
     }

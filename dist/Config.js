@@ -11,6 +11,10 @@ class Config {
         this.layoutPath = './';
         this.highlightStyle = './';
         this.outPath = './build/';
+        this.load();
+    }
+    // Allows reloading
+    load() {
         if (!fs_1.default.existsSync('./sscfg.json')) {
             console.log('Error: Missing config: ./sscfg.json');
             process.exit();

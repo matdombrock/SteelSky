@@ -7,6 +7,10 @@ class Config{
     outPath: string = './build/';
     // Loads config file
     constructor(){
+        this.load();
+    }
+    // Allows reloading
+    public load(){
         if(!fs.existsSync('./sscfg.json')){
             console.log('Error: Missing config: ./sscfg.json');
             process.exit();

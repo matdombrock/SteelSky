@@ -1,0 +1,6 @@
+{
+    "sourcePath": "./source",
+    "layoutPath": "./layout",
+    "highlightStyle": "monokai-sublime",
+    "outPath": "./build/"
+}

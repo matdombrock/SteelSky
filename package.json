@@ -1,11 +1,11 @@
 {
   "name": "steelsky",
-  "version": "2.1.0",
+  "version": "3.0.1",
   "description": "A *very* lightweight, no BS static site generator written in NodeJS.",
-  "main": "steelsky.js",
+  "main": "./dist/cli.js",
   "type": "commonjs",
   "bin": {
-    "steelsky": "./steelsky.js"
+    "steelsky": "./dist/cli.js"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -18,6 +18,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "chokidar": "^3.5.3",
+    "commander": "^10.0.1",
     "showdown": "^1.9.1",
     "showdown-highlight": "^2.1.7"
   },

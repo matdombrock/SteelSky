@@ -8,3 +8,4 @@ exports.default = `
 /____/\\__/\\___/\\___/_//____/_/|_|\\__, /  
                                 /____/   
 `;
+// Escaping  ASCII art is fun :)

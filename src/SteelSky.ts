@@ -14,7 +14,7 @@ interface OutMeta{
 }
 
 class SteelSky{
-    private cfg: Config = new Config;
+    public cfg: Config = new Config;
     private sections: RenderSections;
     private converter: showdown.Converter;
     private outListing:Array<ListItem> = [];
@@ -55,9 +55,6 @@ class SteelSky{
             }
         }
         this.buildDir();
-    }
-    public watch():void{
-        //
     }
     //
     // Private methods

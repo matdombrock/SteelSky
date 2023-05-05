@@ -39,7 +39,6 @@ program
     .command('build', { isDefault: true })
     .description('build all files or a single file')
     .option('-t, --target <path>', 'build the target file or directory')
-    .option('-l, --layout', 'only rebuild the layout files')
     .action((options) => {
     const ss = new SteelSky_js_1.default;
     ss.build(options);

@@ -51,9 +51,6 @@ class SteelSky {
         }
         this.buildDir();
     }
-    watch() {
-        //
-    }
     //
     // Private methods
     //

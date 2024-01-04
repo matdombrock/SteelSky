@@ -1,6 +1,6 @@
 # STEEL SKY
 
-A *very* lightweight, no BS static site generator written in NodeJS.
+A *very* lightweight, no BS static site generator written in TypeScript.
 
 Automatically converts an arbitrary directory structure containing markdown and other static assets into a static site with no external dependencies. 
 

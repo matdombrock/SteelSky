@@ -197,25 +197,39 @@ class SteelSky {
   // Build the RSS feed from this.outListing
   private buildRSS(): string {
     console.log('Building RSS feed...');
+    function escapeXML(str: string): string {
+      return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&apos;');
+    }
     let rssItems = this.outListing
-      .filter(item => item.originalExt === '.md')
+      .filter(item => item.originalExt === '.md' && item.location.startsWith('posts/') && item.meta.date)
+      .sort((a, b) => {
+        const dateA = new Date(a.meta.date || '').getTime();
+        const dateB = new Date(b.meta.date || '').getTime();
+        return dateB - dateA;
+      })
+      .slice(0, 20)
       .map(item => {
-        const meta = item.meta || {};
+        const meta = item.meta;
         return `
   <item>
-    <title>${meta.title || item.path.name}</title>
+    <title>${escapeXML(meta.title)}</title>
     <link>${this.cfg.rssURL}/${item.location}</link>
-    <description>${meta.description || ''}</description>
-    <pubDate>${meta.date || new Date().toUTCString()}</pubDate>
+    <description>${escapeXML(meta.description) || ''}</description>
+    <pubDate>${new Date(meta.date).toUTCString()}</pubDate>
   </item>`;
       }).join('\n');
 
     const rss = `<?xml version="1.0" encoding="UTF-8" ?>
 <rss version="2.0">
   <channel>
-    <title>${this.cfg.rssTitle || 'SteelSky RSS'}</title>
-    <link>${this.cfg.rssURL}</link>
-    <description>${this.cfg.rssDescription || ''}</description>
+    <title>${escapeXML(this.cfg.rssTitle)}</title>
+    <link>${escapeXML(this.cfg.rssURL)}</link>
+    <description>${escapeXML(this.cfg.rssDescription) || ''}</description>
 ${rssItems}
   </channel>
 </rss>`;

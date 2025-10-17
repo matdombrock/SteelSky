@@ -5,6 +5,10 @@ class Config {
   layoutPath: string = './';
   highlightStyle: string = './';
   outPath: string = './build/';
+  rssTitle: string = 'SteelSky Site';
+  rssURL: string = 'http://example.com';
+  rssDescription: string = 'A static site generated with SteelSky.';
+
   // Loads config file
   constructor() {
     this.load();
@@ -21,6 +25,11 @@ class Config {
     this.layoutPath = parsed.layoutPath;
     this.highlightStyle = parsed.highlightStyle;
     this.outPath = parsed.outPath;
+    this.rssTitle = parsed.rssTitle;
+    this.rssURL = parsed.rssURL;
+    this.rssDescription = parsed.rssDescription;
+    console.log('Config loaded.');
+    console.log(this);
   }
 }
 export default Config;

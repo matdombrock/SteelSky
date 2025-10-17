@@ -194,11 +194,41 @@ class SteelSky {
       + this.sections.footerHTML;
     return html;
   }
+  // Build the RSS feed from this.outListing
+  private buildRSS(): string {
+    console.log('Building RSS feed...');
+    let rssItems = this.outListing
+      .filter(item => item.originalExt === '.md')
+      .map(item => {
+        const meta = item.meta || {};
+        return `
+  <item>
+    <title>${meta.title || item.path.name}</title>
+    <link>${this.cfg.rssURL}/${item.location}</link>
+    <description>${meta.description || ''}</description>
+    <pubDate>${meta.date || new Date().toUTCString()}</pubDate>
+  </item>`;
+      }).join('\n');
+
+    const rss = `<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0">
+  <channel>
+    <title>${this.cfg.rssTitle || 'SteelSky RSS'}</title>
+    <link>${this.cfg.rssURL}</link>
+    <description>${this.cfg.rssDescription || ''}</description>
+${rssItems}
+  </channel>
+</rss>`;
+    return rss;
+  }
   private writeMeta(): void {
+    // Write the RSS feed
+    const rssData: string = this.buildRSS();
+    fs.writeFileSync(this.cfg.outPath + '/rss.xml', rssData);
     // Write the listing data
-    fs.writeFileSync(this.cfg.outPath + '/listing.json', JSON.stringify(this.outListing, null, 2));
-    // Copy the ssList file
-    fs.copyFileSync(__dirname + '/../resources/ssList.js', this.cfg.outPath + '/ssList.js');
+    fs.writeFileSync(this.cfg.outPath + '/ss-listing.json', JSON.stringify(this.outListing, null, 2));
+    // Copy the resources
+    fs.copyFileSync(__dirname + '/../resources/ssAPI.js', this.cfg.outPath + '/ssAPI.js');
   }
 }
 

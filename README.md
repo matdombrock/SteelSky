@@ -73,7 +73,10 @@ SteelSky uses a very simple config file:
     "sourcePath": "./source",
     "layoutPath": "./layout",
     "highlightStyle": "monokai-sublime",
-    "outPath": "./build/"
+    "outPath": "./build/",
+    "rssTitle": "SteelSky Website",
+    "rssURL": "https://example.com",
+    "rssDescription": "My SteelSky Site"
 }
 ```
 

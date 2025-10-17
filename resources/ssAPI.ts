@@ -130,7 +130,7 @@ class SSAPI {
         : 'Unknown date';
       const postHTML = `
       <div class="ss-post-item">
-        <h2><a href="${post.location}">${post.meta.title || 'Untitled Post'}</a></h2>
+        <h2><a href="/${post.location}">${post.meta.title || 'Untitled Post'}</a></h2>
         <p class="ss-post-date">${formattedDate}</p>
         <p class="ss-post-description">${post.meta.description || ''}</p>
         <hr/>

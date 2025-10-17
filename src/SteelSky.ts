@@ -144,11 +144,12 @@ class SteelSky {
         this.cfg.outPath + '/' + fileLoc
       );
     }
-    if (noExt[0] === '/') {
-      // Remove the first char
-      noExt = noExt.substring(0);
-    }
-    const listingLoc: string = noExt.replace(/^\/+/g, '') + ext;//Remove leading slash
+    // if (noExt[0] === '/') {
+    //   // Remove the first char
+    //   noExt = noExt.substring(0);
+    // }
+    // const listingLoc: string = noExt.replace(/^\/+/g, '') + ext;//Remove leading slash
+    const listingLoc: string = noExt + ext;
     let outListing: ListItem = {
       path: parsed,
       location: listingLoc,

@@ -43,16 +43,19 @@ program
   .version('1.0.0');
 
 program
-  .command('build <inputDir> <outputDir>')
+  .command('build')
   .description('Build the static site')
-  .action(async (inputDir, outputDir) => {
-    const inputRoot = path.resolve(inputDir);
-    const outputRoot = path.resolve(outputDir);
+  .option('-i, --input <inputDir>', 'Input directory', '.')
+  .option('-o, --output <outputDir>', 'Output directory', './output')
+  .option('-u, --url <baseURL>', 'Base URL override for the site')
+  .action(async (options) => {
+    const inputRoot = path.resolve(options.input);
+    const outputRoot = path.resolve(options.output);
     if (!fs.existsSync(inputRoot)) {
       console.error(`Input directory does not exist: ${inputRoot}`);
       process.exit(1);
     }
-    const core = new SSCore(inputRoot, outputRoot);
+    const core = new SSCore(inputRoot, outputRoot, options.url);
     await core.build();
   });
 

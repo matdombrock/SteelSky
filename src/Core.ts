@@ -32,9 +32,10 @@ const HEAD = `
 type ChromeLocations = 'header' | 'footer' | 'top' | 'bottom';
 
 class SSCore {
-  constructor(inputRoot: string, outputRoot: string) {
+  constructor(inputRoot: string, outputRoot: string, baseURLOverride?: string) {
     this.inputRoot = inputRoot;
     this.outputRoot = outputRoot;
+    this.baseURLOverride = baseURLOverride;
     this.converter = new showdown.Converter({
       extensions: [showdownHighlight({ pre: true })],
     });
@@ -47,6 +48,9 @@ class SSCore {
     this.log('Loading config', 'step');
     const cfgRaw = fs.readFileSync(Path.join(this.inputRoot, 'ssconfig.json'), 'utf-8');
     this.config = JSON.parse(cfgRaw) as Config;
+    if (this.baseURLOverride) {
+      this.config.baseURL = this.baseURLOverride;
+    }
     this.log(JSON.stringify(this.config, null, 2), 'info');
 
     // Compile TS files in the inputRoot
@@ -128,10 +132,11 @@ class SSCore {
     // Each page in `/posts/` with a date in the front matter is considered a blog post and will be included in the RSS feed
     this.log('Generating RSS feed', 'step');
     const posts = pageMetas.filter(meta => meta.path.startsWith('/posts/') && meta.date);
+    const baseURL = this.config.baseURL || '';
     const rssItems = posts.map(post => `
       <item>
         <title>${post.title}</title>
-        <link>${post.path}</link>
+        <link>${baseURL}${post.path}</link>
         <description>${post.description}</description>
         <pubDate>${new Date(post.date).toUTCString()}</pubDate>
       </item>
@@ -170,6 +175,7 @@ class SSCore {
   private chrome: { [key: string]: string };
   private converter: showdown.Converter;
   private templates: Record<string, string>;
+  private baseURLOverride: string | undefined;
   private log(message: string, mode: 'info' | 'step' | 'warn' | 'ok' | 'error' = 'info') {
     const prefix = `[${mode.toUpperCase()}]`;
     let color;
@@ -370,13 +376,21 @@ class SSCore {
   private buildHeader(pageMeta: PageMeta): string {
     // Check if we have a header for this path
     const pathHeader = this.getChrome('header', pageMeta);
+
+    const baseURL = this.config.baseURL || '';
+    const imgURL = pageMeta.image ? `${baseURL}${pageMeta.image}` : '';
     return `
       ${HEAD}
       <title>${pageMeta.title}</title>
       <meta name="description" content="${pageMeta.description}">
       <meta property="og:title" content="${pageMeta.title}">
       <meta property="og:description" content="${pageMeta.description}">
-      <meta property="og:image" content="${pageMeta.image}">
+      <meta property="og:image" content="${imgURL}">
+      <meta property="og:url" content="${pageMeta.path}">
+      <meta name="twitter:card" content="summary_large_image">
+      <meta name="twitter:title" content="${pageMeta.title}">
+      <meta name="twitter:description" content="${pageMeta.description}">
+      <meta name="twitter:image" content="${imgURL}">
       </head>
       <script>
           // Add pageMeta to window for later use

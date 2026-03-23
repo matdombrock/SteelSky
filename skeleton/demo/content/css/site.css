@@ -60,8 +60,14 @@ footer {
   height: var(--footer-height);
   background-color: var(--bg2);
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: center;
+}
+
+footer div {
+  width: 100%;
+  text-align: center;
 }
 
 a {

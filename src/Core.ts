@@ -2,7 +2,7 @@ import showdown from "showdown";
 import showdownHighlight from "showdown-highlight";
 import prettier from "prettier";
 import fs from 'fs';
-import * as Path from 'path';
+import path, * as Path from 'path';
 import chalk from 'chalk';
 
 import { spawnSync } from "child_process";
@@ -29,6 +29,8 @@ const HEAD = `
     <link rel="stylesheet" href="/css/site.css">
 `
 
+type ChromeLocations = 'header' | 'footer' | 'top' | 'bottom';
+
 class SSCore {
   constructor(inputRoot: string, outputRoot: string) {
     this.inputRoot = inputRoot;
@@ -37,8 +39,7 @@ class SSCore {
       extensions: [showdownHighlight({ pre: true })],
     });
     this.templates = {};
-    this.chromeHeader = '';
-    this.chromeFooter = '';
+    this.chrome = {};
     this.config = {} as Config;
   }
   public async build() {
@@ -79,11 +80,21 @@ class SSCore {
       }
     }
 
-    // Load the chrome header and footer
-    this.log('Loading chrome header and footer', 'step');
+    // Load the chrome
+    // It is not converted from markdown until final render
+    this.log('Loading chrome', 'step');
     const chromePath = Path.join(this.inputRoot, DIR_CHROME);
-    this.chromeHeader = fs.readFileSync(Path.join(chromePath, 'header.html'), 'utf-8');
-    this.chromeFooter = fs.readFileSync(Path.join(chromePath, 'footer.html'), 'utf-8');
+    const chromeListing = this.listFiles(chromePath);
+    for (const filePath of chromeListing) {
+      const ext = Path.extname(filePath);
+      const name = Path.basename(filePath, ext);
+      if (ext === '.md') {
+        const content = fs.readFileSync(filePath, 'utf-8');
+        this.chrome[name] = content;
+        this.log(`Loaded chrome ${name} from ${filePath}`);
+      }
+    }
+    console.log(this.chrome);
 
     // Then we process all content files
     const contentList = this.listFiles(DIR_CONTENT);
@@ -156,8 +167,7 @@ class SSCore {
   private config: Config;
   private inputRoot: string;
   private outputRoot: string;
-  private chromeHeader: string;
-  private chromeFooter: string;
+  private chrome: { [key: string]: string };
   private converter: showdown.Converter;
   private templates: Record<string, string>;
   private log(message: string, mode: 'info' | 'step' | 'warn' | 'ok' | 'error' = 'info') {
@@ -345,7 +355,21 @@ class SSCore {
 
     return result;
   }
+  // Returns processed crhome for the given location
+  private getChrome(loc: ChromeLocations, pageMeta: PageMeta): string {
+    const basePath = Path.dirname(pageMeta.path).slice(1);
+    let pathChrome = '';
+    const chromeTarget = `${basePath}.${loc}`;
+    if (this.chrome[chromeTarget]) {
+      pathChrome = this.chrome[chromeTarget];
+    }
+    pathChrome = this.handleTemplates(pathChrome, pageMeta);
+    pathChrome = this.converter.makeHtml(pathChrome);
+    return pathChrome;
+  }
   private buildHeader(pageMeta: PageMeta): string {
+    // Check if we have a header for this path
+    const pathHeader = this.getChrome('header', pageMeta);
     return `
       ${HEAD}
       <title>${pageMeta.title}</title>
@@ -359,7 +383,8 @@ class SSCore {
           window.pageMeta = ${JSON.stringify(pageMeta)};
       </script>
       <body>
-      ${this.chromeHeader}
+      ${this.chrome.header}
+      ${pathHeader}
       <div id="page-content">
       `.trim();
   }
@@ -375,11 +400,17 @@ class SSCore {
     // We can now use the page meta to build the page
     const converted = this.converter.makeHtml(content);
     const header = this.buildHeader(pageMeta);
+    const pathTop = this.getChrome('top', pageMeta);
+    const pathBottom = this.getChrome('bottom', pageMeta);
+    const pathFooter = this.getChrome('footer', pageMeta);
     let fullContent = `
         ${header}
+        ${pathTop}
         ${converted}
+        ${pathBottom}
         </div> <!-- #page-content -->
-        ${this.chromeFooter}
+        ${pathFooter}
+        ${this.chrome.footer}
         </body>
         </html>`;
     fullContent = await prettier.format(fullContent, { parser: 'html' });

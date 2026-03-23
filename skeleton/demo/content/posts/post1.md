@@ -5,14 +5,6 @@ image=/img/gamess.png
 date=2026-01-01
 ```
 
-# ```/front:title```
-
-```/front:date```
-
-```/front:description```
-
----
-
 ## Introduction
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque euismod, urna eu tincidunt consectetur, nisi nisl aliquam enim, vitae facilisis sapien erat nec erat. Suspendisse potenti. Etiam euismod, justo at facilisis cursus, urna erat dictum urna, nec dictum sapien enim nec urna. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Etiam at dictum ex. 
@@ -79,10 +71,3 @@ In conclusion, placeholder text plays a vital role in the design and development
 ---
 
 *This is a placeholder blog post. Replace this text with your actual content.*
-
----
-
-## Random Post
-
-```/posts random="true" max="1" search="false"```
-

@@ -156,15 +156,22 @@ It is also possible for the `<template>.md` file to include JS & CSS in addition
 
 In any `./content/*.md` file you can include a template into the page with this syntax:
 
-```md
-{{my_template 
+````md
+```/my_template 
 content="my content!"
 count="5"
 }}
 ```
+````
 
 This will be replaced with the processed template content *before* the page is rendered from markdown to HTML. 
 
+### Front Matter
+
+You can also access front matter with the syntax:
+````md
+```/front:title```
+````
 
 ## Typescript
 

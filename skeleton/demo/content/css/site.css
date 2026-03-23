@@ -1,12 +1,6 @@
 :root {
   --header-height: 4vh;
   --footer-height: 10vh;
-  --text: hsl(0, 0%, 90%);
-  --muted: hsl(0, 0%, 60%);
-  --bg: hsl(0, 0%, 10%);
-  --bg2: hsl(0, 0%, 15%);
-  --accent: hsl(40, 100%, 50%);
-  --accent2: hsl(10, 100%, 50%);
   --shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.8);
   --radius: 0.5rem;
 }

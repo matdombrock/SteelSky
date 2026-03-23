@@ -5,4 +5,4 @@ description=all of the posts
 
 # Posts
 
-```/posts```
+```/posts search="true"```

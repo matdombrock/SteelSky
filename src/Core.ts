@@ -27,6 +27,7 @@ const HEAD = `
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/css/hljs-theme.css">
     <link rel="stylesheet" href="/css/site.css">
+    <link rel="stylesheet" href="/css/colors.css">
 `
 
 type ChromeLocations = 'header' | 'footer' | 'top' | 'bottom';

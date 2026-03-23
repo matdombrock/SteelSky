@@ -7,7 +7,7 @@
     "steelsky": "dist/cli.js"
   },
   "scripts": {
-    "build": "tsc && cp -r ./skeleton ./dist/skeleton",
+    "build": "tsc && chmod +x dist/cli.js && cp -rf ./skeleton ./dist",
     "prepare": "npm run build"
   },
   "keywords": [],

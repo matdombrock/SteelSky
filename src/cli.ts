@@ -13,6 +13,31 @@ const ASCII = `
 █████▀   ██   ██▄▄▄ ██▄▄▄ ██▄▄▄ █████▀ ██ ██   █   
                                                    
 `
+
+//
+// Utility
+//
+
+function copyRecursiveSync(src: string, dest: string) {
+  const exists = fs.existsSync(src);
+  const stats = exists && fs.statSync(src);
+  const isDirectory = exists && stats && stats.isDirectory();
+  if (isDirectory) {
+    if (!fs.existsSync(dest)) {
+      fs.mkdirSync(dest, { recursive: true });
+    }
+    fs.readdirSync(src).forEach((childItemName) => {
+      copyRecursiveSync(path.join(src, childItemName), path.join(dest, childItemName));
+    });
+  } else {
+    fs.copyFileSync(src, dest);
+  }
+}
+
+//
+// CLI
+//
+
 program
   .name('steelsky')
   .description('Static site generator CLI for SteelSky2')
@@ -41,7 +66,6 @@ program
   .action((targetDir) => {
     const pathMod = require('path');
     const fsMod = require('fs');
-    const copyRecursiveSync = require('./skeleton_copy').default;
     const skeletonDir = pathMod.resolve(__dirname, 'skeleton');
     const destDir = pathMod.resolve(process.cwd(), targetDir);
     if (!fsMod.existsSync(skeletonDir)) {

@@ -2,11 +2,8 @@
   "name": "steelsky",
   "version": "5.0.0",
   "description": "A no BS static site generator",
-  "main": "dist/index.js",
-  "scripts": {
-    "build": "ts-node src/Core",
-    "watch": "ts-node-dev --watch skeleton/min --respawn --transpile-only src/Core"
-  },
+  "main": "dist/cli.ts",
+  "scripts": {},
   "keywords": [],
   "author": "",
   "license": "MIT",

@@ -2,8 +2,14 @@
   "name": "steelsky",
   "version": "5.0.0",
   "description": "A no BS static site generator",
-  "main": "dist/cli.ts",
-  "scripts": {},
+  "main": "dist/cli.js",
+  "bin": {
+    "steelsky": "dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc && cp -r ./skeleton ./dist/skeleton",
+    "prepare": "npm run build"
+  },
   "keywords": [],
   "author": "",
   "license": "MIT",

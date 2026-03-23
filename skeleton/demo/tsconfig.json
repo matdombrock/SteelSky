@@ -3,8 +3,8 @@
     "target": "ES6",
     "module": "ESNext",
     "moduleResolution": "Node",
-    "outDir": "./ts-dist",                // Output to same directory as source
-    "rootDir": "./",               // Root directory for input files
+    "outDir": "./ts-dist",
+    "rootDir": "./",
     "declaration": false,
     "sourceMap": true,
     "esModuleInterop": true,

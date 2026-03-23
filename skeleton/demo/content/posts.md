@@ -1,4 +1,4 @@
-```/page-meta 
+```/front 
 title=posts
 description=all of the posts
 ```

@@ -1,4 +1,4 @@
-```/page-meta 
+```/front
 title=about
 description=the about page for this site
 ```

@@ -1,4 +1,4 @@
-```/page-meta 
+```/front 
 title=Post Seven
 description=Seven test post
 date=2026-01-07

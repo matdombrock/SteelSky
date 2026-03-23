@@ -1,4 +1,4 @@
-```/page-meta 
+```/front 
 title=Post One
 description=First test post
 image=/img/gamess.png

@@ -10,7 +10,7 @@ import { spawnSync } from "child_process";
 import Config from './Config';
 import { PageMeta, FrontMatter } from './SSTypes';
 
-const PAGE_FM_OPEN = '```/page-meta';
+const PAGE_FM_OPEN = '```/front';
 const PAGE_FM_CLOSE = '```';
 const TEMPLATE_OPEN = '```/';
 const TEMPLATE_CLOSE = '```';

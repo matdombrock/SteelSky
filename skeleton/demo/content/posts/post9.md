@@ -1,4 +1,4 @@
-```/page-meta 
+```/front 
 title=Post Nine
 description=Ninth test post
 date=2026-01-09

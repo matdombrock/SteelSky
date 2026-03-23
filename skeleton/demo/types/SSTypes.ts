@@ -1,5 +1,7 @@
+// This is a copy from the SteelSky source
+
 // The metadata found on the page
-export type FrontMatter = {
+type FrontMatter = {
   title: string;
   description: string;
   image: string;
@@ -7,7 +9,9 @@ export type FrontMatter = {
 }
 
 // The full metadata used by steelsky
-export type PageMeta = FrontMatter & {
+type PageMeta = FrontMatter & {
   path: string;
   ext: string;
 }
+
+export type { FrontMatter, PageMeta };

@@ -1,4 +1,4 @@
-```/page-meta 
+```/front 
 title=home
 description=the home page for this site
 extra=this is some extra metadata

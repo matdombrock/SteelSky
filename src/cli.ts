@@ -7,12 +7,11 @@ import fs from 'fs';
 const program = new Command();
 
 const ASCII = `
-                                                   
 ▄█████ ▄▄▄▄▄▄ ▄▄▄▄▄ ▄▄▄▄▄ ▄▄    ▄█████ ▄▄ ▄▄ ▄▄ ▄▄ 
 ▀▀▀▄▄▄   ██   ██▄▄  ██▄▄  ██    ▀▀▀▄▄▄ ██▄█▀ ▀███▀ 
 █████▀   ██   ██▄▄▄ ██▄▄▄ ██▄▄▄ █████▀ ██ ██   █   
-                                                   
 `
+console.log(ASCII);
 
 //
 // Utility
@@ -40,22 +39,19 @@ function copyRecursiveSync(src: string, dest: string) {
 
 program
   .name('steelsky')
-  .description('Static site generator CLI for SteelSky2')
+  .description('CLI for SteelSky - Static Site Generator')
   .version('1.0.0');
 
 program
-  .command('build')
+  .command('build <inputDir> <outputDir>')
   .description('Build the static site')
-  .option('-i, --input <inputDir>', 'Input root directory', 'skeleton/demo')
-  .option('-o, --output <outputDir>', 'Output directory', 'output')
-  .action(async (opts) => {
-    const inputRoot = path.resolve(opts.input);
-    const outputRoot = path.resolve(opts.output);
+  .action(async (inputDir, outputDir) => {
+    const inputRoot = path.resolve(inputDir);
+    const outputRoot = path.resolve(outputDir);
     if (!fs.existsSync(inputRoot)) {
       console.error(`Input directory does not exist: ${inputRoot}`);
       process.exit(1);
     }
-    console.log(ASCII);
     const core = new SSCore(inputRoot, outputRoot);
     await core.build();
   });
@@ -66,7 +62,7 @@ program
   .action((targetDir) => {
     const pathMod = require('path');
     const fsMod = require('fs');
-    const skeletonDir = pathMod.resolve(__dirname, 'skeleton');
+    const skeletonDir = pathMod.resolve(__dirname, 'skeleton', 'demo');
     const destDir = pathMod.resolve(process.cwd(), targetDir);
     if (!fsMod.existsSync(skeletonDir)) {
       console.error('Skeleton directory not found:', skeletonDir);

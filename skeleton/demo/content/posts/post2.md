@@ -1,4 +1,4 @@
-```/page-meta 
+```/front 
 title=Post Two
 description=Second test post
 date=2026-01-02

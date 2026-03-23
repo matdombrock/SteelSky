@@ -5,7 +5,13 @@ image=/img/gamess.png
 date=2026-01-01
 ```
 
-# The Journey of Placeholder Text: A Comprehensive Exploration
+# ```/front:title```
+
+```/front:date```
+
+```/front:description```
+
+---
 
 ## Introduction
 
@@ -73,4 +79,10 @@ In conclusion, placeholder text plays a vital role in the design and development
 ---
 
 *This is a placeholder blog post. Replace this text with your actual content.*
+
+---
+
+## Random Post
+
+```/posts random="true" max="1" search="false"```
 

@@ -9,6 +9,9 @@ import { Posts } from '/templates/posts.js';
 window.onload = function() {
     const posts = new Posts('posts-wrap');
     posts.setMaxPosts(Number({{max = 999}}));
+    posts.setRandomOrder('{{random = "false"}}');
+    posts.setShowSearchBar('{{search = "true"}}')
     posts.build();
 };
 </script>
+

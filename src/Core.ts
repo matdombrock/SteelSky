@@ -257,8 +257,14 @@ class SSCore {
   // {{templateName param1="value1" param2="value2"}}
   // Template defs look like this:
   // This is my template: {{param1}} and {{param2}}
-  private handleTemplates(content: string): string {
+  private handleTemplates(content: string, pageMeta: PageMeta): string {
     let result = content;
+
+    // 0. Replace any front matter references in the content with actual values from the page meta
+    result = result.replace(/```\/front:([\w-]+)```/g, (_, key) => {
+      // Support nested keys if needed, for now just top-level
+      return (pageMeta as any)[key] ?? '';
+    });
 
     // 1. Find all markdown code blocks and replace them with placeholders
     const codeBlocks: string[] = [];
@@ -365,7 +371,7 @@ class SSCore {
     // We are done with the front matter, we can remove it from the content
     content = this.removeFrontMatter(content);
     // Handle templates in the content
-    content = this.handleTemplates(content);
+    content = this.handleTemplates(content, pageMeta);
     // We can now use the page meta to build the page
     const converted = this.converter.makeHtml(content);
     const header = this.buildHeader(pageMeta);

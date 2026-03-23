@@ -5,12 +5,15 @@ export class Posts {
   private postsFiltered: PageMeta[];
   private maxPosts: number;
   private filterString: string;
+  private randomOrder: boolean;
+  private showSearchBar: boolean = true;
   constructor(rootElementId: string) {
     this.rootElement = document.getElementById(rootElementId);
     this.posts = [];
     this.postsFiltered = [];
     this.maxPosts = 999;
     this.filterString = '';
+    this.randomOrder = false;
   }
   public setMaxPosts(max: number) {
     this.maxPosts = max;
@@ -18,15 +21,39 @@ export class Posts {
   public setFilterString(filter: string) {
     this.filterString = filter;
   }
+  public setRandomOrder(random: 'true' | 'false') {
+    const bool = random === 'true';
+    this.randomOrder = bool;
+  }
+  public setShowSearchBar(show: 'true' | 'false') {
+    const bool = show === 'true';
+    this.showSearchBar = bool;
+  }
   public async build() {
     await this.getPosts();
     this.filterPosts();
-    this.renderSearchBar();
+    if (this.showSearchBar) {
+      this.renderSearchBar();
+    }
     this.renderPosts();
+  }
+  private async getPosts() {
+    try {
+      const response = await fetch('/listing.json');
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      let res = await response.json();
+      this.posts = res;
+    }
+    catch (error) {
+      console.error('Error fetching posts:', error);
+    }
   }
   private filterPosts() {
     // Filter only posts (assuming posts are under /posts/)
     let filtered = this.posts.filter((post: PageMeta) => post.path.startsWith('/posts/'));
+
     // If filterString is set, filter posts by title
     if (this.filterString) {
       const filterLower = this.filterString.toLowerCase();
@@ -39,24 +66,20 @@ export class Posts {
           || filterLower.includes(descriptionLower);
       });
     }
+
     // Sort posts by date (newest first)
     filtered.sort((a: PageMeta, b: PageMeta) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+    // Randomize order if randomOrder is true
+    if (this.randomOrder) {
+      for (let i = filtered.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [filtered[i], filtered[j]] = [filtered[j], filtered[i]];
+      }
+    }
     // Limit the number of posts to maxPosts
     filtered = filtered.slice(0, this.maxPosts);
     this.postsFiltered = filtered;
-  }
-  private async getPosts() {
-    try {
-      const response = await fetch('listing.json');
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      let res = await response.json();
-      this.posts = res;
-    }
-    catch (error) {
-      console.error('Error fetching posts:', error);
-    }
   }
   private renderSearchBar() {
     const searchBar = document.createElement('input');

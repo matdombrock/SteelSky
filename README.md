@@ -2,6 +2,14 @@
 
 SteelSky is a "no BS" minimalist static site generator built for small personal websites and blogs. 
 
+## Features
+
+- Build with an intuitive mix of Markdown and HTML
+- Full TypeScript support
+- Simple templating system
+- Automatic RSS feed
+- 100% vanilla TS/JS
+
 ## CLI
 
 ### Install

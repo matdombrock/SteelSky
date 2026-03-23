@@ -1,2 +1,6 @@
 node_modules/
-dist
+dist/
+output/
+hljs-styles/
+note.md
+plan.md

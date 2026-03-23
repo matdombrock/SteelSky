@@ -34,7 +34,7 @@
 }
 
 .post a {
-  color: var(--accent2);
+  color: var(--accent);
   text-decoration: none;
 }
 
@@ -42,6 +42,16 @@
   font-size: 1.2rem;
   font-weight: bold;
   color: var(--text) !important;
+}
+
+.post-description {
+  color: var(--text);
+}
+
+.post-date {
+  color: var(--muted);
+  font-size: 0.8rem;
+  margin-top: auto;
 }
 
 .post-info {
@@ -80,4 +90,10 @@
   box-shadow: var(--shadow);
   margin: 1rem auto;
   display: block;
+}
+
+@media (max-width: 1000px) {
+  .search-bar {
+    width: 80%;
+  }
 }

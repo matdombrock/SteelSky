@@ -110,18 +110,17 @@ export class Posts {
     }
     else {
       this.postsFiltered.forEach(post => {
-        const postElement = document.createElement('div');
+        const postElement = document.createElement('a');
+        postElement.href = post.path;
         postElement.className = 'post';
         postElement.innerHTML = `
         <div class="post-info">
-          <a class="post-title" href="${post.path}">${post.title}</a>
-          <p class="post-description">${post.description}</p>
+          <span class="post-title">${post.title}</span>
           <p class="post-date">${new Date(post.date).toLocaleDateString()}</p>
+          <p class="post-description">${post.description}</p>
           <a href="${post.path}">Read more</a>
         </div>
-        <a href="${post.path}">
-          <div class="post-image" style="background-image: url('${post.image}')"></div>
-        </a>
+        <div class="post-image" style="background-image: url('${post.image}')"></div>
       `;
         postWrap.appendChild(postElement);
       });

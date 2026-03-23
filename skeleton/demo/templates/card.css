@@ -1,12 +1,12 @@
 .card {
   padding: 1rem;
-  border: var(--border);
   border-radius: 0.5rem;
   box-shadow: var(--shadow);
   margin-bottom: 1rem;
   overflow: hidden;
   display: inline-block;
-  width: calc(49% - 2rem);
+  width: calc(49.5% - 2rem);
+  max-width: calc(49.5% - 2rem);
   min-height: 26rem;
   max-height: 26rem;
 }
@@ -67,9 +67,10 @@
   padding: 1rem;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1000px) {
   .card {
-    width: 100%;
+    width: calc(100% - 2rem);
+    max-width: calc(100% - 2rem);
     height: auto;
   }
 

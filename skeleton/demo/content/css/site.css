@@ -119,3 +119,10 @@ pre {
   border-radius: var(--radius);
   box-shadow: var(--shadow);
 }
+
+@media (max-width: 1000px) {
+  #page-content {
+    padding: 1rem;
+    max-width: 100%;
+  }
+}

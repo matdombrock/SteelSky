@@ -1,7 +1,7 @@
 <!-- 
-When templates are used more than once per page
-they should have their CSS and JS split into their own files
-Each will be included only once per page
+when templates are used more than once per page
+they should have their css and js split into their own files
+each will be included only once per page
 -->
 <div class="card">
   <a href="{{ url }}">
@@ -11,8 +11,9 @@ Each will be included only once per page
     </div>
   </a>
   <div class="card-body">
-    <markdown>
     {{ body }}
-    </markdown>
+  </div>
+  <div class="card-footer">
+    {{ footer =  }}
   </div>
 </div>

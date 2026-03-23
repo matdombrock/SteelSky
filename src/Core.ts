@@ -70,7 +70,7 @@ class SSCore {
       }
     }
 
-    // Load all templates into memory, so they can be used when converting content files
+    // Load templates into memory, so they can be used when converting content files
     this.log('Loading templates files', 'step');
     const templateFiles = this.listFiles(DIR_TEMPLATES);
     for (const filePath of templateFiles) {
@@ -290,7 +290,7 @@ class SSCore {
       return `__CODEBLOCK_PLACEHOLDER_${codeBlocks.length - 1}__`;
     });
 
-    // 2. Render templates as before (outside code blocks)
+    // 2. Render templates 
     const templateRegex = new RegExp(`${TEMPLATE_OPEN}(\\w+)([^${TEMPLATE_CLOSE}]*)${TEMPLATE_CLOSE}`, 'g');
     let match;
     const includedCss = new Set<string>();

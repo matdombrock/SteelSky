@@ -187,6 +187,7 @@ An example config might look like:
 
 ```json
 {
+  "baseURL": "http://localhost:3002",
   "siteTitle": "SteelSky Demo",
   "siteDescription": "SteelSky Demo Site",
   "siteImage": "/img/icon.png",
@@ -194,6 +195,8 @@ An example config might look like:
   "compileTs": true
 }
 ```
+
+Note: The `baseURL` is for generating social media links and RSS feeds. You probably don't need to change it for local development. 
 
 ## Page Front Matter & Metadata
 

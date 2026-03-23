@@ -1,32 +1,27 @@
 {
   "name": "steelsky",
-  "version": "4.0.2",
-  "description": "A *very* lightweight, no BS static site generator written in NodeJS.",
-  "main": "./dist/cli.js",
-  "type": "commonjs",
-  "bin": {
-    "steelsky": "./dist/cli.js"
-  },
+  "version": "5.0.0",
+  "description": "A no BS static site generator",
+  "main": "dist/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc",
-    "build-res": "cd resources && tsc"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/matdombrock/SteelSky.git"
+    "build": "ts-node src/Core",
+    "watch": "ts-node-dev --watch skeleton/min --respawn --transpile-only src/Core"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/showdown": "^2.0.1",
+    "ts-node": "^10.0.0",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.0.0"
+  },
   "dependencies": {
-    "chokidar": "^3.5.3",
+    "chalk": "^5.6.2",
     "commander": "^10.0.1",
+    "prettier": "^3.8.1",
     "showdown": "^1.9.1",
     "showdown-highlight": "^2.1.7"
-  },
-  "devDependencies": {
-    "@types/node": "^18.16.3",
-    "@types/showdown": "^2.0.1"
   }
 }

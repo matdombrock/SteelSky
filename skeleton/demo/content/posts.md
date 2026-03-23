@@ -1,0 +1,8 @@
+```/page-meta 
+title=posts
+description=all of the posts
+```
+
+# Posts
+
+```/posts```

@@ -1,74 +1,59 @@
-#! /usr/bin/env node
-/*
-  Commander Setup
-*/
-import { Command } from 'commander'; // (normal include);
-import SteelSky from './SteelSky.js';
-import SSInit from './SSInit.js';
-import SSWatch from './SSWatch.js';
-import VERSION_NUMBER from './util/getPkgVer.js';
-import ascii from './util/ascii.js';
+#!/usr/bin/env node
+import { Command } from 'commander';
+import SSCore from './Core';
+import path from 'path';
+import fs from 'fs';
 
 const program = new Command();
 
-console.log(ascii);
-
+const ASCII = `
+                                                   
+▄█████ ▄▄▄▄▄▄ ▄▄▄▄▄ ▄▄▄▄▄ ▄▄    ▄█████ ▄▄ ▄▄ ▄▄ ▄▄ 
+▀▀▀▄▄▄   ██   ██▄▄  ██▄▄  ██    ▀▀▀▄▄▄ ██▄█▀ ▀███▀ 
+█████▀   ██   ██▄▄▄ ██▄▄▄ ██▄▄▄ █████▀ ██ ██   █   
+                                                   
+`
 program
   .name('steelsky')
-  .description(`			
-SteelSky v${VERSION_NUMBER}	
-A dead simple static site generator. 
-
-GPL3 | Mathieu Dombrock 2023
-`
-  )
-  //.helpOption(false)
-  //.addHelpCommand(false)
-  //.addHelpText('after','\nNote: All commands are prefixed with "." to avoid conflicting with prompts!')
-  .showHelpAfterError('Use `steelsky --help` or `steelsky [cmd] --help` for more info.')
-  .version('v' + VERSION_NUMBER);
+  .description('Static site generator CLI for SteelSky2')
+  .version('1.0.0');
 
 program
-  .command('help')
-  .description('show help')
-  .action(() => {
-    console.log("HELP");
-    program.help();
+  .command('build')
+  .description('Build the static site')
+  .option('-i, --input <inputDir>', 'Input root directory', 'skeleton/demo')
+  .option('-o, --output <outputDir>', 'Output directory', 'output')
+  .action(async (opts) => {
+    const inputRoot = path.resolve(opts.input);
+    const outputRoot = path.resolve(opts.output);
+    if (!fs.existsSync(inputRoot)) {
+      console.error(`Input directory does not exist: ${inputRoot}`);
+      process.exit(1);
+    }
+    console.log(ASCII);
+    const core = new SSCore(inputRoot, outputRoot);
+    await core.build();
   });
 
 program
-  .command('build', { isDefault: true })
-  .description('build all files or a single file')
-  .option('-t, --target <path>', 'build the target file or directory')
-  .action((options) => {
-    const ss: SteelSky = new SteelSky;
-    ss.build(options);
+  .command('init <targetDir>')
+  .description('Copy the skeleton files to a new directory for quick project setup')
+  .action((targetDir) => {
+    const pathMod = require('path');
+    const fsMod = require('fs');
+    const copyRecursiveSync = require('./skeleton_copy').default;
+    const skeletonDir = pathMod.resolve(__dirname, 'skeleton');
+    const destDir = pathMod.resolve(process.cwd(), targetDir);
+    if (!fsMod.existsSync(skeletonDir)) {
+      console.error('Skeleton directory not found:', skeletonDir);
+      process.exit(1);
+    }
+    if (fsMod.existsSync(destDir)) {
+      console.error('Target directory already exists:', destDir);
+      process.exit(1);
+    }
+    copyRecursiveSync(skeletonDir, destDir);
+    console.log(`Skeleton files copied to ${destDir}`);
   });
 
-program
-  .command('watch')
-  .description('watch for changes and build files')
-  .action(() => {
-    const ssWatch: SSWatch = new SSWatch;
-    ssWatch.watch();
-  });
-
-program
-  .command('init')
-  .description('initialize a new steelsky project')
-  .option('-m, --minimal', 'dont add example source files')
-  .action((options) => {
-    const ssInit: SSInit = new SSInit;
-    ssInit.init(options);
-  });
-
-program
-  .command('page')
-  .description('create a new steelsky page in the current directory')
-  .argument('<name>', 'the name of the page to create')
-  .action((name) => {
-    const ssInit: SSInit = new SSInit;
-    ssInit.page(name);
-  });
-
-program.parse();
+program.parse(process.argv);

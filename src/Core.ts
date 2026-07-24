@@ -39,6 +39,7 @@ class SSCore {
     this.baseURLOverride = baseURLOverride;
     this.converter = new showdown.Converter({
       extensions: [showdownHighlight({ pre: true })],
+      tables: true,
     });
     this.templates = {};
     this.chrome = {};

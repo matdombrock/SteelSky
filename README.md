@@ -192,11 +192,29 @@ An example config might look like:
   "siteDescription": "SteelSky Demo Site",
   "siteImage": "/img/icon.png",
   "highlightStyle": "a11y-dark",
-  "compileTs": true
+  "compileTs": true,
+  "directoryIndex": false
 }
 ```
 
 Note: The `baseURL` is for generating social media links and RSS feeds. You probably don't need to change it for local development. 
+
+### `directoryIndex` (optional)
+
+By default every markdown page builds to a `.html` file (`content/faq.md` → `output/faq.html`, URL `/faq.html`). Set `"directoryIndex": true` to instead build non-`index.md` pages into a directory so each page is served at a clean directory URL:
+
+| Content file | URL (default) | URL (`directoryIndex: true`) |
+|---|---|---|
+| `content/faq.md` | `/faq.html` | `/faq/` |
+| `content/dolos/manual.md` | `/dolos/manual.html` | `/dolos/manual/` |
+| `content/posts/post1.md` | `/posts/post1.html` | `/posts/post1/` |
+
+- Opt-in and default off, so existing sites are untouched.
+- `index.md` files are untouched: `content/index.md` → `output/index.html`, section indexes like `content/dolos/index.md` → `output/dolos/index.html`.
+- `pageMeta.path`, `listing.json`, and the RSS feed follow the new scheme automatically.
+- If `content/foo.md` and `content/foo/index.md` both exist they would both map to `output/foo/index.html`; the directory index wins and `foo.md` is skipped.
+- The section index page (`content/posts/index.md` → `/posts/index.html`) is never listed as a post in the RSS feed or the client-side posts listing.
+- Internal links in your `content/`, `chrome/`, and `templates/` that point at `.html` URLs must be updated by hand to the new directory URLs (`/faq.html` → `/faq/`).
 
 ## Page Front Matter & Metadata
 

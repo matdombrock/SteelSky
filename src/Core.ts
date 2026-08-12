@@ -105,9 +105,14 @@ class SSCore {
     // Then we process all content files
     const contentList = this.listFiles(DIR_CONTENT);
     this.log('Processing content files', 'step');
+    const skippedMdFiles = this.detectOutputCollisions(contentList);
     const pageMetas: PageMeta[] = [];
     for (const filePath of contentList) {
       const ext = Path.extname(filePath);
+      if (skippedMdFiles.has(filePath)) {
+        this.log(`Skipping file: ${Path.relative(this.inputRoot, filePath)} (output collides with a directory index page)`, 'warn');
+        continue;
+      }
       let pageMeta: PageMeta;
       if (ext === '.md') {
         pageMeta = await this.convertFile(filePath);
@@ -132,8 +137,9 @@ class SSCore {
 
     // Generate an RSS feed based on the page metas
     // Each page in `/posts/` with a date in the front matter is considered a blog post and will be included in the RSS feed
+    // The section index page itself is not a post: content/posts.md with directoryIndex maps to /posts/, content/posts/index.md maps to /posts/index.html
     this.log('Generating RSS feed', 'step');
-    const posts = pageMetas.filter(meta => meta.path.startsWith('/posts/') && meta.date);
+    const posts = pageMetas.filter(meta => meta.path.startsWith('/posts/') && meta.date && meta.path !== '/posts/' && meta.path !== '/posts/index.html');
     const baseURL = this.config.baseURL || '';
     const rssItems = posts.map(post => `
       <item>
@@ -263,13 +269,69 @@ class SSCore {
   private handlePageMeta(filePath: string, content: string): PageMeta {
     const pageMeta = this.newPageMeta();
     pageMeta.ext = '.html';
-    pageMeta.path = '/' + Path.relative(this.inputRoot, filePath).replace(/\\/g, '/').replace(/\.md$/, '.html').replace(DIR_CONTENT, '');
+    pageMeta.path = this.mdPagePath(Path.relative(this.inputRoot, filePath));
     // Look for page meta
     const frontMatter = this.handleFrontMatter(content);
     // Override page meta full with page meta
     Object.assign(pageMeta, frontMatter);
     // We now have the full page meta
     return pageMeta;
+  }
+  private directoryIndexEnabled(): boolean {
+    return this.config.directoryIndex === true;
+  }
+  // Output path (relative to outputRoot) for a markdown content file.
+  // With directoryIndex enabled, non-index.md pages build into a directory:
+  //   content/faq.md -> output/faq/index.html -> URL /faq/
+  // index.md files are untouched:
+  //   content/index.md -> output/index.html
+  //   content/dolos/index.md -> output/dolos/index.html
+  private mdOutputRelPath(relativePath: string): string {
+    const htmlRel = relativePath.replace(/\.md$/, '.html').replace(DIR_CONTENT, '');
+    if (!this.directoryIndexEnabled()) {
+      return htmlRel;
+    }
+    if (Path.basename(relativePath, '.md') === 'index') {
+      return htmlRel;
+    }
+    return `${relativePath.replace(/\.md$/, '').replace(DIR_CONTENT, '')}/index.html`;
+  }
+  // URL for a markdown content file, following the same convention as the output path
+  private mdPagePath(relativePath: string): string {
+    const urlPath = '/' + relativePath.replace(/\\/g, '/').replace(DIR_CONTENT, '').replace(/\.md$/, '');
+    if (!this.directoryIndexEnabled() || Path.basename(relativePath, '.md') === 'index') {
+      return urlPath + '.html';
+    }
+    return urlPath + '/';
+  }
+  // With directoryIndex enabled, content/foo.md and content/foo/index.md would
+  // both map to output/foo/index.html. The directory index wins: foo.md is
+  // skipped (not built, not listed in listing.json).
+  private detectOutputCollisions(contentList: string[]): Set<string> {
+    const skipped = new Set<string>();
+    if (!this.directoryIndexEnabled()) {
+      return skipped;
+    }
+    const seenOutputs = new Map<string, string>();
+    for (const filePath of contentList) {
+      if (Path.extname(filePath) !== '.md') {
+        continue;
+      }
+      const relativePath = Path.relative(this.inputRoot, filePath);
+      const outputRel = this.mdOutputRelPath(relativePath);
+      const existing = seenOutputs.get(outputRel);
+      if (existing) {
+        const currentIsIndex = Path.basename(relativePath, '.md') === 'index';
+        const keep = currentIsIndex ? relativePath : existing;
+        const skip = currentIsIndex ? existing : relativePath;
+        this.log(`Output collision: '${existing}' and '${relativePath}' both map to '${outputRel}'. Directory wins: keeping '${keep}', skipping '${skip}'.`, 'warn');
+        skipped.add(Path.join(this.inputRoot, skip));
+        seenOutputs.set(outputRel, keep);
+      } else {
+        seenOutputs.set(outputRel, relativePath);
+      }
+    }
+    return skipped;
   }
   // Templates usage look like this:
   // {{templateName param1="value1" param2="value2"}}
@@ -432,7 +494,7 @@ class SSCore {
     fullContent = await prettier.format(fullContent, { parser: 'html' });
     // Write the full content to the output directory
     const relativePath = Path.relative(this.inputRoot, filePath);
-    const outputPath = Path.join(this.outputRoot, relativePath.replace(/\.md$/, '.html')).replace(DIR_CONTENT, '');
+    const outputPath = Path.join(this.outputRoot, this.mdOutputRelPath(relativePath));
     fs.mkdirSync(Path.dirname(outputPath), { recursive: true });
     fs.writeFileSync(outputPath, fullContent, 'utf-8');
     return pageMeta;

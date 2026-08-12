@@ -51,8 +51,12 @@ export class Posts {
     }
   }
   private filterPosts() {
-    // Filter only posts (assuming posts are under /posts/)
-    let filtered = this.posts.filter((post: PageMeta) => post.path.startsWith('/posts/'));
+    // Filter only posts (assuming posts are under /posts/).
+    // The section index page itself is not a post: /posts/index.html from
+    // content/posts/index.md, or /posts/ from content/posts.md with directoryIndex.
+    let filtered = this.posts.filter((post: PageMeta) =>
+      post.path.startsWith('/posts/') && post.path !== '/posts/index.html' && post.path !== '/posts/'
+    );
 
     // If filterString is set, filter posts by title
     if (this.filterString) {

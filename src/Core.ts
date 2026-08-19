@@ -405,11 +405,12 @@ class SSCore {
     // are dropped). This keeps the output valid HTML that the formatter accepts.
     return { html: serialize(parseFragment(renderedTemplate)), links };
   }
-  // Converts a param value into final HTML. Markdown is rendered, plain-text
-  // values stay plain (a single wrapping <p> is unwrapped), and already-HTML
-  // values pass through untouched.
+  // Converts a param value into final HTML. Only multi-line values (content-style
+  // params) are run through markdown/a single <p> unwrap, so block/rich content
+  // renders. Single-line scalar values (urls, text, ids, classes) are kept
+  // verbatim so markdown syntax like underscores in URLs isn't interpreted.
   private renderParamValue(value: string): string {
-    if (value.trim() === '') {
+    if (value.trim() === '' || (!value.includes('\n') && !value.includes('\r'))) {
       return value;
     }
     const html = this.converter.makeHtml(value);

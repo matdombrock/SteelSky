@@ -4,6 +4,7 @@ import prettier from "prettier";
 import fs from 'fs';
 import path, * as Path from 'path';
 import chalk from 'chalk';
+import { parseFragment, serialize } from 'parse5';
 
 import { spawnSync } from "child_process";
 
@@ -337,6 +338,106 @@ class SSCore {
   // {{templateName param1="value1" param2="value2"}}
   // Template defs look like this:
   // This is my template: {{param1}} and {{param2}}
+  // Renders a single template usage (fence body) into its final HTML.
+  // Accumulates css/js include links in the shared `includedCss` set.
+  private renderTemplateUsage(
+    templateName: string,
+    paramString: string,
+    includedCss: Set<string>
+  ): { html: string; links: string } {    let templateContent = this.templates[templateName];
+    let links = '';
+    if (!templateContent) {
+      this.log(`Template not found: ${templateName}`, 'warn');
+      return { html: '', links };
+    }
+    const cssFileName = `${templateName}.css`;
+    const cssFilePath = Path.join(this.inputRoot, DIR_TEMPLATES, cssFileName);
+    if (!includedCss.has(cssFileName) && fs.existsSync(cssFilePath)) {
+      links += `<link rel="stylesheet" href="/templates/${cssFileName}">\n`;
+      includedCss.add(cssFileName);
+    }
+    const jsFileName = `${templateName}.js`;
+    const jsFilePath = Path.join(this.inputRoot, DIR_TEMPLATES, jsFileName);
+    const jsFileDistPath = Path.join(this.inputRoot, DIR_TS_DIST, DIR_TEMPLATES, jsFileName);
+    if (fs.existsSync(jsFilePath)) {
+      links += `<script type="module" src="/templates/${jsFileName}" defer></script>\n`;
+      templateContent = `<div class="template-${templateName}">\n${templateContent}\n</div>`;
+    }
+    if (fs.existsSync(jsFileDistPath)) {
+      links += `<script type="module" src="/templates/${jsFileName}" defer></script>\n`;
+      templateContent = `<div class="template-${templateName}">\n${templateContent}\n</div>`;
+    }
+
+    // Parse params from usage
+    const params: Record<string, string> = {};
+    const paramRegex = /(\w+)=(["'])((?:\\.|(?!\2)[^\\])*)\2/g;
+    let paramMatch;
+    while ((paramMatch = paramRegex.exec(paramString)) !== null) {
+      const [, key, , value] = paramMatch;
+      params[key] = value.replace(/\\(["'\\])/g, '$1');
+    }
+
+    // Parse default values from template definition: {{param = value}}
+    const defaultParams: Record<string, string> = {};
+    templateContent = templateContent.replace(/{{\s*(\w+)\s*=\s*([^}]+)\s*}}/g, (m, key, value) => {
+      let v = value.trim();
+      // Strip a matching pair of surrounding quotes, e.g. 'cta' -> cta
+      const quoteMatch = v.match(/^(["'])([\s\S]*)\1$/);
+      if (quoteMatch) v = quoteMatch[2];
+      defaultParams[key] = v.replace(/\\(["'\\])/g, '$1');
+      // Replace with a normal param placeholder for later replacement
+      return `{{${key}}}`;
+    });
+
+    // Merge params: usage > default
+    const mergedParams = { ...defaultParams, ...params };
+
+    // Replace all {{param}} with merged values
+    let renderedTemplate = templateContent;
+    for (const [key, value] of Object.entries(mergedParams)) {
+      renderedTemplate = renderedTemplate.replace(
+        new RegExp(`{{\\s*${key}\\s*}}`, 'g'),
+        this.renderParamValue(value)
+      );
+    }
+    // Normalize the rendered template the way a browser parses it (HTML5 rules:
+    // <p> auto-closes before block content, orphan end tags are parse errors and
+    // are dropped). This keeps the output valid HTML that the formatter accepts.
+    return { html: serialize(parseFragment(renderedTemplate)), links };
+  }
+  // Converts a param value into final HTML. Markdown is rendered, plain-text
+  // values stay plain (a single wrapping <p> is unwrapped), and already-HTML
+  // values pass through untouched.
+  private renderParamValue(value: string): string {
+    if (value.trim() === '') {
+      return value;
+    }
+    const html = this.converter.makeHtml(value);
+    const singlePara = html.match(/^<p>([\s\S]*)<\/p>$/);
+    return singlePara ? singlePara[1] : html;
+  }
+  // Renders templates into already-converted HTML (templates render after markdown
+  // conversion, so their block HTML is never re-processed by the markdown pass).
+  private renderTemplates(
+    html: string,
+    usages: Array<{ templateName: string; paramString: string }>
+  ): string {
+    const includedCss = new Set<string>();
+    let includeLinks = '';
+    let result = html;
+    for (let i = 0; i < usages.length; i++) {
+      const rendered = this.renderTemplateUsage(usages[i].templateName, usages[i].paramString, includedCss);
+      includeLinks += rendered.links;
+      result = result.replace(`<!--__SS_TPL_${i}__-->`, rendered.html);
+    }
+    if (includeLinks) {
+      result = includeLinks + result;
+    }
+    return result;
+  }
+  // Renders templates before markdown conversion. Used for chrome, where template
+  // references live inside markdown (e.g. ```/front:title) and must be substituted
+  // before the markdown pass.
   private handleTemplates(content: string, pageMeta: PageMeta): string {
     let result = content;
 
@@ -353,7 +454,7 @@ class SSCore {
       return `__CODEBLOCK_PLACEHOLDER_${codeBlocks.length - 1}__`;
     });
 
-    // 2. Render templates 
+    // 2. Render templates
     const templateRegex = new RegExp(`${TEMPLATE_OPEN}(\\w+)([^${TEMPLATE_CLOSE}]*)${TEMPLATE_CLOSE}`, 'g');
     let match;
     const includedCss = new Set<string>();
@@ -361,58 +462,9 @@ class SSCore {
 
     while ((match = templateRegex.exec(result)) !== null) {
       const [fullMatch, templateName, paramString] = match;
-      let templateContent = this.templates[templateName];
-      if (templateContent) {
-        const cssFileName = `${templateName}.css`;
-        const cssFilePath = Path.join(this.inputRoot, DIR_TEMPLATES, cssFileName);
-        if (!includedCss.has(cssFileName) && fs.existsSync(cssFilePath)) {
-          includeLinks += `<link rel="stylesheet" href="/templates/${cssFileName}">\n`;
-          includedCss.add(cssFileName);
-        }
-        const jsFileName = `${templateName}.js`;
-        const jsFilePath = Path.join(this.inputRoot, DIR_TEMPLATES, jsFileName);
-        const jsFileDistPath = Path.join(this.inputRoot, DIR_TS_DIST, DIR_TEMPLATES, jsFileName);
-        if (fs.existsSync(jsFilePath)) {
-          includeLinks += `<script type="module" src="/templates/${jsFileName}" defer></script>\n`;
-          templateContent = `<div class="template-${templateName}">\n${templateContent}\n</div>`;
-        }
-        if (fs.existsSync(jsFileDistPath)) {
-          includeLinks += `<script type="module" src="/templates/${jsFileName}" defer></script>\n`;
-          templateContent = `<div class="template-${templateName}">\n${templateContent}\n</div>`;
-        }
-
-        // Parse params from usage
-        const params: Record<string, string> = {};
-        const paramRegex = /(\w+)="([^"]*)"/g;
-        let paramMatch;
-        while ((paramMatch = paramRegex.exec(paramString)) !== null) {
-          const [, key, value] = paramMatch;
-          params[key] = value;
-        }
-
-        // Parse default values from template definition: {{param = value}}
-        const defaultParams: Record<string, string> = {};
-        templateContent = templateContent.replace(/{{\s*(\w+)\s*=\s*([^}]+)\s*}}/g, (m, key, value) => {
-          defaultParams[key] = value.trim();
-          // Replace with a normal param placeholder for later replacement
-          return `{{${key}}}`;
-        });
-
-        // Merge params: usage > default
-        const mergedParams = { ...defaultParams, ...params };
-
-        // Replace all {{param}} with merged values
-        let renderedTemplate = templateContent;
-        for (const [key, value] of Object.entries(mergedParams)) {
-          renderedTemplate = renderedTemplate.replace(
-            new RegExp(`{{\\s*${key}\\s*}}`, 'g'),
-            value
-          );
-        }
-        result = result.replace(fullMatch, renderedTemplate);
-      } else {
-        this.log(`Template not found: ${templateName}`, 'warn');
-      }
+      const rendered = this.renderTemplateUsage(templateName, paramString, includedCss);
+      includeLinks += rendered.links;
+      result = result.replace(fullMatch, rendered.html);
     }
 
     // 3. Prepend CSS/JS links if any
@@ -473,10 +525,19 @@ class SSCore {
     const pageMeta = this.handlePageMeta(filePath, content);
     // We are done with the front matter, we can remove it from the content
     content = this.removeFrontMatter(content);
-    // Handle templates in the content
-    content = this.handleTemplates(content, pageMeta);
-    // We can now use the page meta to build the page
+    // Protect template usages from the markdown pass: replace each ```/name...```
+    // fence with a marker, convert the markdown, then render templates into the
+    // converted HTML (templates render after markdown conversion).
+    const usages: Array<{ templateName: string; paramString: string }> = [];
+    const usageRegex = new RegExp(`${TEMPLATE_OPEN}(\\w+)([^${TEMPLATE_CLOSE}]*)${TEMPLATE_CLOSE}`, 'g');
+    content = content.replace(usageRegex, (m, templateName, paramString) => {
+      usages.push({ templateName, paramString });
+      return `<!--__SS_TPL_${usages.length - 1}__-->`;
+    });
+    // Markdown conversion first
     const converted = this.converter.makeHtml(content);
+    // Render templates into the converted HTML
+    content = this.renderTemplates(converted, usages);
     const header = this.buildHeader(pageMeta);
     const pathTop = this.getChrome('top', pageMeta);
     const pathBottom = this.getChrome('bottom', pageMeta);
@@ -484,7 +545,7 @@ class SSCore {
     let fullContent = `
         ${header}
         ${pathTop}
-        ${converted}
+        ${content}
         ${pathBottom}
         </div> <!-- #page-content -->
         ${pathFooter}

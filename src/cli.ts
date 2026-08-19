@@ -40,7 +40,7 @@ function copyRecursiveSync(src: string, dest: string) {
 program
   .name('steelsky')
   .description('CLI for SteelSky - Static Site Generator')
-  .version('1.0.0');
+  .version('1.0.1');
 
 program
   .command('build')
